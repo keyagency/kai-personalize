@@ -6,7 +6,7 @@ This document outlines the planned implementation of Pro licensing for Kai Perso
 
 **Status:** 📋 Planned - Not Yet Implemented
 **Estimated Effort:** 6-10 hours
-**Priority:** Medium (post-v1.3.1)
+**Priority:** Medium (post-v1.1.0)
 
 ---
 

@@ -1,7 +1,7 @@
 # Kai Personalize - Statamic Add-on
 
 [![Statamic Marketplace](https://img.shields.io/badge/Statamic-Marketplace-orange.svg)](https://statamic.com/marketplace/addons/kai-personalize)
-[![Latest Version](https://img.shields.io/badge/version-v1.3.1-blue.svg)](https://github.com/keyagency/kai-personalize/releases)
+[![Latest Version](https://img.shields.io/badge/version-v1.1.0-blue.svg)](https://github.com/keyagency/kai-personalize/releases)
 
 **Adaptive content delivery based on visitor attributes and behavior**
 
@@ -53,7 +53,7 @@ Advanced features for growing businesses:
 
 ## Current Status
 
-**Version:** v1.3.0 - Production Ready
+**Version:** v1.1.0 - Production Ready
 **Status:** All core features complete and functional. Now compatible with Statamic 6!
 
 ### ✅ What's Working Now:
