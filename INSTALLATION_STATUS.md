@@ -1,6 +1,6 @@
 # Kai Personalize - Installation Status
 
-## Version 1.1.0 - Production Ready
+## Version 1.1.1 - Production Ready
 
 This addon is **fully implemented and production-ready**. All core features, Control Panel interfaces, and frontend tracking are complete.
 
@@ -271,7 +271,7 @@ kai-personalize/
 
 ## 🎉 Production Ready - Complete Feature Set
 
-**Version:** 1.1.0
+**Version:** 1.1.1
 **Status:** Production Ready
 **Database:** 12 tables
 **Controllers:** 7 controllers
