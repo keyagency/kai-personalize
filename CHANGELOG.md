@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [1.1.1] - 2026-03-20
+## 1.1.1 (2026-03-13)
 
 ### Changed
 - **Edition Rename**: "Free" edition renamed to "Lite" edition
@@ -16,7 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Separate CHANGELOG.md file (moved from README.md)
 
-## [1.1.0] - 2025-03-20
+## 1.1.0 (2025-03-20)
 
 ### Added
 - **Core Features**
@@ -80,7 +80,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Localization**
   - Full English and Dutch support
 
-## [1.0.0] - 2025-02-01
+## 1.0.0 (2025-02-01)
 
 ### Added
 - Initial release
