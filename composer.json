@@ -1,0 +1,48 @@
+{
+    "name": "keyagency/kai-personalize",
+    "description": "Adaptive content delivery based on visitor attributes and behavior",
+    "type": "statamic-addon",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Key Agency",
+            "email": "info@keyagency.nl"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "statamic/cms": "^6.0",
+        "jenssegers/agent": "^2.6",
+        "geoip2/geoip2": "^3.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0",
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "KeyAgency\\KaiPersonalize\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "KeyAgency\\KaiPersonalize\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "Kai Personalize",
+            "description": "Adaptive content delivery based on visitor attributes and behavior",
+            "developer": "Key Agency",
+            "developer_url": "https://keyagency.nl",
+            "editions": ["free", "pro"]
+        },
+        "laravel": {
+            "providers": [
+                "KeyAgency\\KaiPersonalize\\ServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

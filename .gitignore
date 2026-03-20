@@ -1,0 +1,24 @@
+# Claude Code files
+.claude/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Composer
+/vendor/
+
+# Build artifacts
+/node_modules/
+/dist/
+*.log
+
+# Published assets
+/public/vendor/

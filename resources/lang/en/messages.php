@@ -1,0 +1,213 @@
+<?php
+
+return [
+    'addon_name' => 'Kai Personalize',
+    'addon_description' => 'Adaptive content delivery based on visitor attributes',
+
+    // Dashboard
+    'dashboard' => [
+        'title' => 'Dashboard',
+        'visitors_today' => 'Visitors Today',
+        'active_sessions' => 'Active Sessions',
+        'total_visitors' => 'Total Visitors',
+        'unique_visitors' => 'Unique Visitors',
+        'page_views' => 'Page Views',
+        'avg_session_duration' => 'Avg Session Duration',
+        'sessions' => 'Sessions',
+        'top_engaged_visitors' => 'Top Engaged Visitors',
+    ],
+
+    // Rules
+    'rules' => [
+        'title' => 'Rules',
+        'create' => 'Create Rule',
+        'edit' => 'Edit Rule',
+        'delete' => 'Delete Rule',
+        'name' => 'Rule Name',
+        'description' => 'Description',
+        'conditions' => 'Conditions',
+        'priority' => 'Priority',
+        'is_active' => 'Active',
+        'created_at' => 'Created',
+        'updated_at' => 'Updated',
+        'no_rules' => 'No rules found',
+        'limit_reached' => 'Free tier limit reached. You can have a maximum of :max active rules. Upgrade to Pro for unlimited rules.',
+        'created' => 'Rule created successfully!',
+        'updated' => 'Rule updated successfully!',
+        'deleted' => 'Rule deleted successfully!',
+    ],
+
+    // Visitors
+    'visitors' => [
+        'title' => 'Visitors',
+        'fingerprint' => 'Fingerprint',
+        'first_visit' => 'First Visit',
+        'last_visit' => 'Last Visit',
+        'visit_count' => 'Visit Count',
+        'location' => 'Location',
+        'device' => 'Device',
+        'browser' => 'Browser',
+        'ip_address' => 'IP Address',
+        'user_agent' => 'User Agent',
+        'sessions' => 'Sessions',
+        'attributes' => 'Attributes',
+    ],
+
+    // Segments
+    'segments' => [
+        'title' => 'Segments',
+        'create' => 'Create Segment',
+        'edit' => 'Edit Segment',
+        'delete' => 'Delete Segment',
+        'name' => 'Segment Name',
+        'description' => 'Description',
+        'criteria' => 'Criteria',
+        'member_count' => 'Members',
+        'created' => 'Segment created successfully!',
+        'updated' => 'Segment updated successfully!',
+        'deleted' => 'Segment deleted successfully!',
+        'pro_feature' => 'Segments are a Pro feature. Upgrade to Pro to use dynamic visitor segments.',
+    ],
+
+    // API Connections
+    'api_connections' => [
+        'title' => 'API Connections',
+        'create' => 'Create Connection',
+        'edit' => 'Edit Connection',
+        'delete' => 'Delete Connection',
+        'test' => 'Test Connection',
+        'name' => 'Connection Name',
+        'provider' => 'Provider',
+        'api_url' => 'API URL',
+        'api_key' => 'API Key',
+        'auth_type' => 'Authentication Type',
+        'is_active' => 'Active',
+        'cache_duration' => 'Cache Duration (seconds)',
+        'timeout' => 'Timeout (seconds)',
+        'rate_limit' => 'Rate Limit (per minute)',
+        'last_used_at' => 'Last Used',
+        'test_success' => 'Connection test successful!',
+        'test_failed' => 'Connection test failed!',
+        'limit_reached' => 'Free tier limit reached. You can have a maximum of :max active API connections. Upgrade to Pro for unlimited connections.',
+        'created' => 'API connection created successfully!',
+        'updated' => 'API connection updated successfully!',
+        'deleted' => 'API connection deleted successfully!',
+    ],
+
+    // Conditions
+    'conditions' => [
+        'country' => 'Country',
+        'city' => 'City',
+        'region' => 'Region',
+        'browser' => 'Browser',
+        'device_type' => 'Device Type',
+        'returning_visitor' => 'Returning Visitor',
+        'time_of_day' => 'Time of Day',
+        'day_of_week' => 'Day of Week',
+        'weather' => 'Weather Condition',
+        'language' => 'Language',
+        'timezone' => 'Timezone',
+    ],
+
+    // Operators
+    'operators' => [
+        'equals' => 'Equals',
+        'not_equals' => 'Not Equals',
+        'contains' => 'Contains',
+        'not_contains' => 'Does Not Contain',
+        'greater_than' => 'Greater Than',
+        'less_than' => 'Less Than',
+        'in' => 'In',
+        'not_in' => 'Not In',
+    ],
+
+    // Settings
+    'settings' => [
+        'title' => 'Settings',
+        'features' => 'Features',
+        'privacy' => 'Privacy',
+        'api_keys' => 'API Keys',
+        'retention' => 'Data Retention',
+        'performance' => 'Performance',
+        'save' => 'Save Settings',
+        'saved' => 'Settings saved successfully!',
+    ],
+
+    // Permissions
+    'permissions' => [
+        'view_dashboard' => 'View Dashboard',
+        'manage_rules' => 'Manage Rules',
+        'view_visitors' => 'View Visitors',
+        'manage_segments' => 'Manage Segments',
+        'manage_api_connections' => 'Manage API Connections',
+        'manage_settings' => 'Manage Settings',
+        'view_analytics' => 'View Analytics',
+    ],
+
+    // General
+    'general' => [
+        'save' => 'Save',
+        'cancel' => 'Cancel',
+        'delete' => 'Delete',
+        'edit' => 'Edit',
+        'create' => 'Create',
+        'view' => 'View',
+        'back' => 'Back',
+        'confirm_delete' => 'Are you sure you want to delete this?',
+        'yes' => 'Yes',
+        'no' => 'No',
+    ],
+
+    // Analytics
+    'analytics' => [
+        'title' => 'Analytics',
+        'engagement_score' => 'Engagement Score',
+        'engagement_score_description' => 'Based on visit frequency, page views, time spent, and scroll depth',
+        'behavioral_summary' => 'Behavioral Summary',
+        'page_history' => 'Page History',
+        'max_scroll_depth' => 'Max Scroll Depth',
+        'reading_time' => 'Reading Time',
+        'total_clicks' => 'Total Clicks',
+        'total_events' => 'Total Events',
+        'page' => 'Page',
+        'collection' => 'Collection',
+        'viewed_at' => 'Viewed At',
+        'avg_scroll_depth' => 'Avg Scroll Depth',
+        'avg_reading_time' => 'Avg Reading Time',
+        'pro_feature' => 'Analytics are a Pro feature. Upgrade to Pro for page-level analytics and engagement scoring.',
+        'pages' => [
+            'title' => 'Page Analytics',
+            'page' => 'Page',
+            'views' => 'Views',
+            'unique_visitors' => 'Unique Visitors',
+            'first_view' => 'First View',
+            'last_view' => 'Last View',
+            'total_views' => 'Total Views',
+            'avg_scroll_depth' => 'Avg Scroll Depth',
+            'avg_reading_time' => 'Avg Reading Time',
+            'recent_views' => 'Recent Views',
+            'view_details' => 'Details',
+        ],
+    ],
+
+    // ActiveCampaign
+    'activecampaign' => [
+        'title' => 'ActiveCampaign',
+        'enabled' => 'ActiveCampaign Integration',
+        'api_url' => 'API URL',
+        'api_key' => 'API Key',
+        'cookie_name' => 'Cookie Name',
+        'cache_ttl' => 'Cache TTL (minutes)',
+        'test_connection' => 'Test Connection',
+        'contact_id' => 'Contact ID',
+        'email' => 'Email',
+        'first_name' => 'First Name',
+        'last_name' => 'Last Name',
+        'phone' => 'Phone',
+        'tags' => 'Tags',
+        'lists' => 'Lists',
+        'custom_fields' => 'Custom Fields',
+        'created_at' => 'Account Created',
+        'updated_at' => 'Last Updated',
+    ],
+];
