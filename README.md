@@ -13,7 +13,7 @@ Kai Personalize is a professional Statamic add-on that enables you to deliver pe
 
 Kai Personalize is available in two editions:
 
-### Free Edition
+### Lite Edition
 Perfect for getting started with personalization:
 
 - Visitor tracking & sessions
@@ -25,7 +25,7 @@ Perfect for getting started with personalization:
 ### Pro Edition
 Advanced features for growing businesses:
 
-- **Everything in Free**
+- **Everything in Lite**
 - Unlimited rules & API connections
 - Analytics dashboard & engagement scoring
 - Dynamic segments
@@ -36,7 +36,7 @@ Advanced features for growing businesses:
 
 ### Feature Comparison
 
-| Feature | Free | Pro |
+| Feature | Lite | Pro |
 |---------|------|-----|
 | Visitor Tracking | ✅ | ✅ |
 | Session Management | ✅ | ✅ |
@@ -1173,97 +1173,6 @@ Proprietary - Copyright © Key Agency
 ## Credits
 
 Developed by Key Agency with AI agent Kai.
-
-## Changelog
-
-### v1.3.1 (2025-02-05)
-**Tracker Queue Improvements:**
-- Added configurable queue threshold (default: 5 events, was hardcoded 10)
-- Added configurable periodic send interval (default: 20 seconds, was hardcoded 30)
-- Added localStorage persistence for queued events
-  - Survives page refreshes and navigation
-  - Automatically restores events on page load
-  - Discards stale events older than configured age (default: 1 hour)
-- Improved error handling for sendBeacon failures
-- Added queue settings to configuration file
-- Added environment variables for queue configuration
-
-### v1.3.0 (2025-02-03)
-**Statamic 6 Compatibility & Major Fixes:**
-- Updated navigation registration to use Statamic 6 `$nav->tools()` pattern
-- Replaced FontAwesome icon strings with custom SVG navigation icon
-- Implemented AJAX-based data loading for Dashboard and Analytics pages
-  - Resolved navigation menu rendering issues caused by complex view data
-  - Added `/data` endpoints for JSON data delivery
-  - Client-side rendering with loading states
-- Disabled tab handling in Settings page (all sections now visible by default)
-- Fixed UUID string conversion issues in JavaScript
-- Updated PHP version requirement to ^8.2 (Statamic 6 requirement)
-- Updated Statamic version requirement to ^6.0
-- Fixed inline JavaScript handling (Statamic 6 doesn't render `@push('scripts')`)
-- Updated children navigation to use closure-based pattern per Statamic 6 conventions
-
-### v1.2.1 (2025-02-02)
-**Improvements:**
-- Converted inline tracking JavaScript to external file (`tracker.js`)
-- Tracker now served via route at `/kai-personalize/tracker.js`
-- Improved browser caching with 1-day cache header
-- Simplified tracking tag output to just config + script reference
-- No build step or asset publishing required
-
-### v1.2.0 (2025-02-02)
-**New Features:**
-- ActiveCampaign email campaign integration
-- Automatic visitor identification from tracking cookies
-- CRM data sync (contact info, tags, lists, custom fields)
-- `kai:test-activecampaign` command for testing AC integration
-- Cookie-based email retrieval with multiple encoding support
-- AC attributes available in `{{ kai:visitor }}` tag
-
-### v1.1.2 (2025-02-02)
-**Security Enhancements:**
-- Added HMAC SHA-256 signature validation for tracking endpoints
-- Added rate limiting middleware (60 requests/minute, 500/hour per IP)
-- Added timestamp validation to prevent replay attacks (5 minute expiry)
-- Added nonce caching for duplicate request detection
-- Added referer/origin validation for cross-origin protection
-- Added input sanitization (event type regex, HTML strip, key whitelist)
-- Added max events per request limit (50, configurable)
-- Added `{{ kai:tracking }}` tag for signature generation
-- Respects proxy headers for rate limiting (CF-Connecting-IP, X-Forwarded-For)
-
-### v1.1.1 (2025-02-02)
-**Bug Fixes & Improvements:**
-- Fixed badge styling in Blade templates (added custom CSS for Statamic CP compatibility)
-- Fixed collection handle detection for Statamic Page objects (structured collections)
-- Enhanced `TrackVisitor` middleware to properly detect collection from `Statamic\Structures\Page` entries
-- Added `getCollectionHandle()` method to handle both Entry and Page types
-- Published CSS assets for proper badge styling in Control Panel views
-
-### v1.1.0 (2025-01-XX)
-**New Features:**
-- Analytics & Engagement Scoring system
-- Per-page analytics with views, unique visitors, scroll depth, and reading time
-- Engagement score (0-100) for each visitor based on visits, page views, reading time, and scroll depth
-- Behavioral summary tracking (max scroll depth, reading time, clicks, total events)
-- Visitor page history with pagination
-- Top engaged visitors ranking on dashboard
-- New `kai:track` tag for manual event tracking
-- New `kai:behavior` tag for retrieving behavioral statistics
-- New PageAnalyticsController for page-level statistics
-- Updated visitor profiles with engagement metrics
-
-### v1.0.0 (2024-XX-XX)
-**Initial Release:**
-- Visitor tracking and session management
-- Browser detection via jenssegers/agent
-- MaxMind GeoIP2 local geolocation
-- External API integration (Weather, Geolocation, Custom)
-- Rule-based personalization
-- Segment management
-- API Connections management
-- Privacy features (IP encryption, DNT, GDPR compliance)
-- Control Panel interface with Dashboard, Rules, Visitors, Segments, and Settings
 
 ## Roadmap
 

@@ -185,7 +185,7 @@ Access via: `__('kai-personalize::messages.key')`
 
 ### Version Number Location
 - **Primary Source:** `src/ServiceProvider.php` - `const VERSION = '1.1.0';`
-- **Display:** Settings page shows version + edition (Free/Pro)
+- **Display:** Settings page shows version + edition (Lite/Pro)
 - **Git Tags:** Official releases use git tags (e.g., `v1.1.0`)
 
 ### When to Update Version

@@ -11,8 +11,8 @@ class SegmentsController extends CpController
 {
     public function __construct()
     {
-        // Block access to segments in free edition
-        if (Edition::isFree()) {
+        // Block access to segments in lite edition
+        if (Edition::isLite()) {
             abort(403, __('kai-personalize::messages.segments.pro_feature'));
         }
     }

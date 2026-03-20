@@ -35,7 +35,7 @@
             "description": "Adaptive content delivery based on visitor attributes and behavior",
             "developer": "Key Agency",
             "developer_url": "https://keyagency.nl",
-            "editions": ["free", "pro"]
+            "editions": ["lite", "pro"]
         },
         "laravel": {
             "providers": [

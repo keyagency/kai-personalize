@@ -7,11 +7,11 @@ use Statamic\Facades\Addon;
 class Edition
 {
     /**
-     * Get the current edition (free or pro)
+     * Get the current edition (lite or pro)
      */
     public static function get(): string
     {
-        return Addon::get('keyagency/kai-personalize')->edition() ?? 'free';
+        return Addon::get('keyagency/kai-personalize')->edition() ?? 'lite';
     }
 
     /**
@@ -23,11 +23,11 @@ class Edition
     }
 
     /**
-     * Check if the current edition is Free
+     * Check if the current edition is Lite
      */
-    public static function isFree(): bool
+    public static function isLite(): bool
     {
-        return self::get() === 'free';
+        return self::get() === 'lite';
     }
 
     /**
@@ -36,7 +36,7 @@ class Edition
     public static function hasFeature(string $feature): bool
     {
         $features = [
-            'free' => [
+            'lite' => [
                 'tracking',
                 'sessions',
                 'basic_rules',
@@ -69,7 +69,7 @@ class Edition
     public static function getLimit(string $limit): mixed
     {
         $limits = [
-            'free' => [
+            'lite' => [
                 'max_rules' => 5,
                 'max_api_connections' => 2,
                 'max_segments' => 0,

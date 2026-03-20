@@ -18,7 +18,7 @@ This document outlines the planned implementation of Pro licensing for Kai Perso
 - **The Outpost**: Statamic's automatic license validation service
 - **No manual validation**: Addon developers don't implement license checking
 - **Local development**: Works without license (trial mode on localhost)
-- **Editions system**: Can offer multiple tiers (free, pro, enterprise)
+- **Editions system**: Can offer multiple tiers (lite, pro, enterprise)
 
 ### How It Works
 
@@ -31,7 +31,7 @@ This document outlines the planned implementation of Pro licensing for Kai Perso
 
 ## Recommended Tier Structure
 
-### FREE Tier
+### LITE Tier
 
 **Purpose:** Essential personalization for small sites
 
@@ -82,7 +82,7 @@ This document outlines the planned implementation of Pro licensing for Kai Perso
    ```php
    'edition' => env('KAI_PERSONALIZE_EDITION', null),
    'features' => [
-       'free' => [...],
+       'lite' => [...],
        'pro' => [...],
    ],
    ```
@@ -91,9 +91,9 @@ This document outlines the planned implementation of Pro licensing for Kai Perso
    ```php
    class Edition
    {
-       public static function get(): string;        // 'free' or 'pro'
+       public static function get(): string;        // 'lite' or 'pro'
        public static function isPro(): bool;
-       public static function isFree(): bool;
+       public static function isLite(): bool;
        public static function hasFeature(string $feature): bool;
        public static function getLimit(string $limit): ?int;
    }
@@ -113,7 +113,7 @@ This document outlines the planned implementation of Pro licensing for Kai Perso
 4. **Update `config/kai-personalize.php`** - Add tiers configuration
    ```php
    'tiers' => [
-       'free' => [
+       'lite' => [
            'visitor_limit' => 1000,
            'retention_days' => 30,
            'max_rules' => 5,
@@ -147,21 +147,21 @@ This document outlines the planned implementation of Pro licensing for Kai Perso
 **Controllers to Modify:**
 
 1. **`RulesController.php`**
-   - Apply rule count limit (max 5 in free tier)
-   - Block advanced condition operators in free tier
+   - Apply rule count limit (max 5 in lite tier)
+   - Block advanced condition operators in lite tier
    - Add upgrade prompts when limits reached
 
 2. **`SegmentsController.php`**
-   - Pro feature gate (entire controller blocked in free tier)
-   - Hide from navigation in free tier
+   - Pro feature gate (entire controller blocked in lite tier)
+   - Hide from navigation in lite tier
 
 3. **`PageAnalyticsController.php`**
-   - Pro feature gate (entire controller blocked in free tier)
-   - Hide from navigation in free tier
+   - Pro feature gate (entire controller blocked in lite tier)
+   - Hide from navigation in lite tier
 
 4. **`ApiConnectionsController.php`**
-   - Apply connection limit (max 2 in free tier)
-   - Hide custom provider option in free tier
+   - Apply connection limit (max 2 in lite tier)
+   - Hide custom provider option in lite tier
 
 5. **`ExportController.php`** (NEW)
    - Pro feature gate (entire controller)
@@ -186,15 +186,15 @@ Schema::create('kai_personalize_usage', function (Blueprint $table) {
 ### Phase 4: UI Updates (2-3 hours)
 
 **Navigation Updates:**
-- Hide "Segments" and "Analytics" in free tier
+- Hide "Segments" and "Analytics" in lite tier
 - Show "Pro" badge on Pro-only features
 - Add upgrade prompts when limits reached
 
 **Upgrade Banner Example:**
 ```blade
-@if(Edition::isFree() && $currentRules >= $maxRules)
+@if(Edition::isLite() && $currentRules >= $maxRules)
 <div class="p-4 bg-yellow-50 border-l-4 border-yellow-400">
-    <p><strong>Free tier limit reached.</strong> Upgrade to Pro for unlimited rules.</p>
+    <p><strong>Lite tier limit reached.</strong> Upgrade to Pro for unlimited rules.</p>
     <a href="https://statamic.com/marketplace/addons/kai-personalize" class="btn">
         Upgrade to Pro
     </a>
@@ -205,14 +205,14 @@ Schema::create('kai_personalize_usage', function (Blueprint $table) {
 **Environment Configuration:**
 ```env
 # .env - Choose edition
-KAI_PERSONALIZE_EDITION=free  # or 'pro'
+KAI_PERSONALIZE_EDITION=lite  # or 'pro'
 ```
 
 ### Phase 5: ServiceProvider Updates (30 minutes)
 
 **`src/ServiceProvider.php` changes:**
 - Register CheckEdition middleware
-- Update navigation to hide Pro items in free tier
+- Update navigation to hide Pro items in lite tier
 - Register Edition helper
 
 ```php
@@ -256,19 +256,19 @@ protected function bootNavigation()
 ### Phase 6: Testing (1-2 hours)
 
 **Test Coverage:**
-1. Free tier restrictions enforced
+1. Lite tier restrictions enforced
 2. Pro tier features accessible
 3. Navigation reflects edition
 4. Upgrade prompts display correctly
 5. Limits are enforced (rules, connections, etc.)
-6. Advanced conditions blocked in free tier
+6. Advanced conditions blocked in lite tier
 7. Export functionality works in Pro only
 
 ---
 
 ## Feature Gates by Controller
 
-| Controller | Free Tier | Pro Tier |
+| Controller | Lite Tier | Pro Tier |
 |------------|-----------|----------|
 | Dashboard | ✅ Full | ✅ Full |
 | RulesController | Max 5 rules, simple operators | Unlimited, all operators |
@@ -285,7 +285,7 @@ protected function bootNavigation()
 
 ```env
 # Edition override (for testing)
-KAI_PERSONALIZE_EDITION=free  # or 'pro', or null for auto-detect
+KAI_PERSONALIZE_EDITION=lite  # or 'pro', or null for auto-detect
 ```
 
 ---
@@ -293,7 +293,7 @@ KAI_PERSONALIZE_EDITION=free  # or 'pro', or null for auto-detect
 ## Marketplace Distribution
 
 1. List on https://statamic.com/marketplace/addons/
-2. Set pricing for each edition (Free: $0, Pro: $XX)
+2. Set pricing for each edition (Lite: $0, Pro: $XX)
 3. Statamic handles license delivery and validation
 4. Users see upgrade options in their Statamic account
 5. No separate license keys needed (unified with Statamic license)
@@ -318,7 +318,7 @@ if (Edition::hasFeature('analytics')) {
 }
 
 // Get limits
-$maxRules = Edition::getLimit('max_rules'); // Returns 5 for free, null for pro
+$maxRules = Edition::getLimit('max_rules'); // Returns 5 for lite, null for pro
 ```
 
 ### Middleware Usage
@@ -335,17 +335,17 @@ Route::get('/analytics', [PageAnalyticsController::class, 'index'])
 ```php
 public function store(Request $request)
 {
-    // Check rule limit in free tier
-    if (Edition::isFree()) {
+    // Check rule limit in lite tier
+    if (Edition::isLite()) {
         $ruleCount = Rule::where('is_active', true)->count();
         if ($ruleCount >= Edition::getLimit('max_rules')) {
-            return back()->with('error', 'Free tier limit reached. Upgrade to Pro for unlimited rules.');
+            return back()->with('error', 'Lite tier limit reached. Upgrade to Pro for unlimited rules.');
         }
     }
 
     // Check for advanced operators
     $conditions = json_decode($request->conditions, true);
-    if (Edition::isFree() && $this->hasAdvancedOperators($conditions)) {
+    if (Edition::isLite() && $this->hasAdvancedOperators($conditions)) {
         return back()->with('error', 'Advanced conditions require Pro edition.');
     }
 
@@ -359,7 +359,7 @@ public function store(Request $request)
 
 When this feature is implemented:
 
-1. **Existing installations** default to Free tier
+1. **Existing installations** default to Lite tier
 2. **No breaking changes** - all current features remain available
 3. **Pro features** added as new capabilities
 4. **Upgrade path** via Statamic marketplace
@@ -382,7 +382,7 @@ When this feature is implemented:
 ## Questions to Answer Before Implementation
 
 1. **Pricing**: What should the Pro tier cost?
-2. **Limits**: Should Free tier have monthly visitor limits?
+2. **Limits**: Should Lite tier have monthly visitor limits?
 3. **Trial**: Should we offer a Pro trial period?
 4. **Migration**: How to handle existing Pro features (analytics, segments)?
 5. **Marketplace**: Submit to Statamic marketplace before or after implementation?

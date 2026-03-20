@@ -13,8 +13,8 @@ class PageAnalyticsController extends CpController
 {
     public function __construct()
     {
-        // Block access to analytics in free edition
-        if (Edition::isFree()) {
+        // Block access to analytics in lite edition
+        if (Edition::isLite()) {
             abort(403, __('kai-personalize::messages.analytics.pro_feature'));
         }
     }

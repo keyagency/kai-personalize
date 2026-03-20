@@ -31,8 +31,8 @@ class RulesController extends CpController
 
     public function store(Request $request)
     {
-        // Check rule limit for free edition
-        if (Edition::isFree() && $request->has('is_active')) {
+        // Check rule limit for lite edition
+        if (Edition::isLite() && $request->has('is_active')) {
             $maxRules = Edition::getLimit('max_rules');
             $activeRuleCount = Rule::where('is_active', true)->count();
 
@@ -101,8 +101,8 @@ class RulesController extends CpController
     {
         $rule = Rule::findOrFail($id);
 
-        // Check rule limit for free edition when activating a rule
-        if (Edition::isFree() && $request->has('is_active') && !$rule->is_active) {
+        // Check rule limit for lite edition when activating a rule
+        if (Edition::isLite() && $request->has('is_active') && !$rule->is_active) {
             $maxRules = Edition::getLimit('max_rules');
             $activeRuleCount = Rule::where('is_active', true)->where('id', '!=', $id)->count();
 

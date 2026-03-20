@@ -37,8 +37,8 @@ class ApiConnectionsController extends CpController
 
     public function store(Request $request)
     {
-        // Check API connection limit for free edition
-        if (Edition::isFree() && $request->has('is_active')) {
+        // Check API connection limit for lite edition
+        if (Edition::isLite() && $request->has('is_active')) {
             $maxConnections = Edition::getLimit('max_api_connections');
             $activeConnectionCount = ApiConnection::where('is_active', true)->count();
 
@@ -120,8 +120,8 @@ class ApiConnectionsController extends CpController
     {
         $connection = ApiConnection::findOrFail($id);
 
-        // Check API connection limit for free edition when activating a connection
-        if (Edition::isFree() && $request->has('is_active') && !$connection->is_active) {
+        // Check API connection limit for lite edition when activating a connection
+        if (Edition::isLite() && $request->has('is_active') && !$connection->is_active) {
             $maxConnections = Edition::getLimit('max_api_connections');
             $activeConnectionCount = ApiConnection::where('is_active', true)->where('id', '!=', $id)->count();
 
