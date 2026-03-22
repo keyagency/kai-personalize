@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format follows standard changelog conventions.
 
+## 1.1.2 - 2026-03-22
+
+### Changed
+- Small bug fixes and documentation updates
+- Version updates for Statamic cache fix
+
 ## 1.1.1 - 2026-03-20
 
 ### Changed
