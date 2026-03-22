@@ -79,10 +79,3 @@ The format follows standard changelog conventions.
 
 - **Localization**
   - Full English and Dutch support
-
-## 1.0.0 - 2025-02-01
-
-### Added
-- Initial release
-- Basic visitor tracking
-- Content personalization engine
