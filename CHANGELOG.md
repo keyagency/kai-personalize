@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format follows standard changelog conventions.
 
-## 1.1.1 - 2026-20-03
+## 1.1.1 (2026-03-20)
 
 ### Changed
 - **Edition Rename**: "Free" edition renamed to "Lite" edition
@@ -16,7 +16,7 @@ The format follows standard changelog conventions.
 ### Added
 - Separate CHANGELOG.md file (moved from README.md)
 
-## 1.1.0 - 2026-20-03
+## 1.1.0 (2026-03-20)
 
 ### Added
 - **Core Features**
@@ -80,7 +80,7 @@ The format follows standard changelog conventions.
 - **Localization**
   - Full English and Dutch support
 
-## 1.0.0 - 2025-02-01
+## 1.0.0 (2025-02-01)
 
 ### Added
 - Initial release
