@@ -44,7 +44,7 @@
 
 <div class="flex justify-end gap-2 mt-4">
     <a href="{{ cp_route('kai-personalize.blacklists.index') }}" class="btn">{{ __('messages.cancel') }}</a>
-    <button type="submit" class="btn-primary">
+    <button type="submit" class="btn btn-primary">
         {{ $blacklist ? __('messages.update') : __('messages.create') }}
     </button>
 </div>

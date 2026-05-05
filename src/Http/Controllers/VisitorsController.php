@@ -3,6 +3,7 @@
 namespace KeyAgency\KaiPersonalize\Http\Controllers;
 
 use Illuminate\Http\Request;
+use KeyAgency\KaiPersonalize\Models\Blacklist;
 use KeyAgency\KaiPersonalize\Models\Visitor;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -87,6 +88,21 @@ class VisitorsController extends CpController
             'pageHistory' => $pageHistory,
             'behaviorSummary' => $behaviorSummary,
         ]);
+    }
+
+    public function blacklist(Request $request, $id)
+    {
+        $request->validate([
+            'type' => 'required|in:bot_name,user_agent',
+            'pattern' => 'required|string|max:255',
+        ]);
+
+        Blacklist::updateOrCreate(
+            ['type' => $request->type, 'pattern' => strtolower($request->pattern)],
+            ['description' => 'Added from visitor #'.$id, 'is_active' => true]
+        );
+
+        return back()->with('success', 'Pattern "'.e($request->pattern).'" added to blacklist.');
     }
 
     public function destroy($id)

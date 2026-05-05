@@ -13,7 +13,7 @@ use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
-    const VERSION = '1.2.1';
+    const VERSION = '1.2.2';
 
     protected $tags = [
         Kai::class,
@@ -27,6 +27,7 @@ class ServiceProvider extends AddonServiceProvider
         Commands\DownloadMaxMindDatabases::class,
         Commands\TestMaxMind::class,
         Commands\TestActiveCampaign::class,
+        Commands\SeedBlacklist::class,
     ];
 
     protected $stylesheets = [

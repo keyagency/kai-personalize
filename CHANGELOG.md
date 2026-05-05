@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format follows standard changelog conventions.
 
+## 1.2.2 - 2026-05-05
+
+### Fixed
+- **BlacklistSeeder autoloading** - Moved from `database/seeders/` to `src/Database/Seeders/` for proper PSR-4 autoloading
+- Added `php artisan kai:seed-blacklist` command for easy database seeding
+
 ## 1.2.1 - 2026-05-05
 
 ### Added
@@ -13,7 +19,7 @@ The format follows standard changelog conventions.
 - Updated blacklist CP views to use Statamic form layout conventions
 - Fixed BlacklistController to extend Statamic CpController
 
-## 1.2.0 - TBD
+## 1.2.0 - 2026-05-04
 
 ### Added
 - **Bot Blacklist Feature**

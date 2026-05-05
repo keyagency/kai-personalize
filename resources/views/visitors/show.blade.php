@@ -142,6 +142,7 @@
                         <th>Value</th>
                         <th>Type</th>
                         <th>Expires</th>
+                        <th class="actions-column"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -151,6 +152,16 @@
                             <td class="text-sm">{{ $attr->attribute_value }}</td>
                             <td><span class="badge-sm badge-info">{{ $attr->attribute_type }}</span></td>
                             <td class="text-xs">{{ $attr->expires_at ? $attr->expires_at->diffForHumans() : 'Never' }}</td>
+                            <td class="actions-column">
+                                @if($attr->attribute_key === 'bot_name')
+                                    <form method="POST" action="{{ cp_route('kai-personalize.visitors.blacklist', $visitor->id) }}">
+                                        @csrf
+                                        <input type="hidden" name="type" value="bot_name">
+                                        <input type="hidden" name="pattern" value="{{ $attr->attribute_value }}">
+                                        <button type="submit" class="btn btn-danger btn-sm">Blacklist</button>
+                                    </form>
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -168,21 +179,39 @@
                 <thead>
                     <tr>
                         <th>Session ID</th>
+                        <th>User Agent</th>
                         <th>Started</th>
                         <th>Ended</th>
                         <th>Page Views</th>
                         <th>Duration</th>
+                        <th class="actions-column"></th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($recentSessions as $session)
                         <tr>
                             <td><code class="text-xs">{{ substr($session->session_id, 0, 16) }}...</code></td>
+                            <td class="text-xs max-w-xs truncate" title="{{ $session->user_agent }}">
+                                {{ $session->user_agent ? Str::limit($session->user_agent, 60) : '-' }}
+                            </td>
                             <td class="text-xs">{{ $session->started_at?->format('M d, H:i') }}</td>
                             <td class="text-xs">{{ $session->ended_at ? $session->ended_at->format('M d, H:i') : 'Active' }}</td>
                             <td>{{ $session->page_views }}</td>
                             <td class="text-xs">
                                 {{ $session->ended_at ? $session->started_at->diffInMinutes($session->ended_at) . ' min' : 'N/A' }}
+                            </td>
+                            <td class="actions-column">
+                                @if($session->user_agent)
+                                    <form method="POST" action="{{ cp_route('kai-personalize.visitors.blacklist', $visitor->id) }}">
+                                        @csrf
+                                        <input type="hidden" name="type" value="user_agent">
+                                        <input type="hidden" name="pattern" value="{{ $session->user_agent }}">
+                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Blacklist user agent: {{ addslashes(Str::limit($session->user_agent, 60)) }}?')">
+                                            Blacklist UA
+                                        </button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
                     @endforeach

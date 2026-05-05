@@ -6,7 +6,7 @@
 <div class="kai-personalize">
     <div class="flex items-center justify-between mb-3">
         <h1 class="flex-1">{{ $title }}</h1>
-        <a href="{{ cp_route('kai-personalize.blacklists.create') }}" class="btn-primary">
+        <a href="{{ cp_route('kai-personalize.blacklists.create') }}" class="btn btn-primary">
             {{ __('kai-personalize::messages.blacklists.add') }}
         </a>
     </div>
@@ -52,15 +52,15 @@
                             <td class="actions-column">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ cp_route('kai-personalize.blacklists.logs', $blacklist) }}"
-                                       class="text-xs text-blue-600 hover:text-blue-800">Logs</a>
+                                       class="btn btn-sm">Logs</a>
                                     <a href="{{ cp_route('kai-personalize.blacklists.edit', $blacklist) }}"
-                                       class="text-xs text-blue-600 hover:text-blue-800">Edit</a>
+                                       class="btn btn-sm">Edit</a>
                                     <form method="POST"
                                           action="{{ cp_route('kai-personalize.blacklists.destroy', $blacklist) }}"
                                           onsubmit="return confirm('Delete this blacklist entry?');" class="inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-xs text-red-600 hover:text-red-800">Delete</button>
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                     </form>
                                 </div>
                             </td>
@@ -71,7 +71,7 @@
         @else
             <div class="p-8 text-center text-gray-600">
                 <p class="mb-4">{{ __('kai-personalize::messages.blacklists.empty') }}</p>
-                <a href="{{ cp_route('kai-personalize.blacklists.create') }}" class="btn-primary">
+                <a href="{{ cp_route('kai-personalize.blacklists.create') }}" class="btn btn-primary">
                     {{ __('kai-personalize::messages.blacklists.add_first') }}
                 </a>
             </div>

@@ -35,6 +35,7 @@ Route::prefix('kai-personalize')->name('kai-personalize.')->group(function () {
         Route::get('/', [VisitorsController::class, 'index'])->name('index');
         Route::get('/{id}', [VisitorsController::class, 'show'])->name('show');
         Route::delete('/{id}', [VisitorsController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/blacklist', [VisitorsController::class, 'blacklist'])->name('blacklist');
     });
 
     // Segments Management

@@ -177,6 +177,8 @@
 
                 <h3 class="kai-section-title">JavaScript Tracking Features</h3>
                 <div class="mb-6">
+                    <span class="badge {{ $config['features']['behavioral_tracking'] ? 'badge-success' : 'badge-neutral' }}">Tracker</span>
+                    <span class="badge {{ $config['tracking']['use_minified_js'] ? 'badge-success' : 'badge-neutral' }}">Minified JS</span>
                     <span class="badge {{ $config['features']['scroll_tracking'] ? 'badge-success' : 'badge-neutral' }}">Scroll Tracking</span>
                     <span class="badge {{ $config['features']['click_tracking'] ? 'badge-success' : 'badge-neutral' }}">Click Tracking</span>
                     <span class="badge {{ $config['features']['form_tracking'] ? 'badge-success' : 'badge-neutral' }}">Form Tracking</span>

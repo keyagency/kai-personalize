@@ -44,11 +44,11 @@ class BlacklistSeeder extends Seeder
         ];
 
         foreach ($items as $item) {
-            Blacklist::firstOrCreate(
+            Blacklist::updateOrCreate(
                 ['type' => $item['type'], 'pattern' => $item['pattern']],
                 [
                     'description' => $item['description'],
-                    'is_active' => false,
+                    'is_active' => true,
                 ]
             );
         }

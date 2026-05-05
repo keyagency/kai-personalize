@@ -41,7 +41,7 @@ class BlacklistController extends CpController
 
         Blacklist::create($validated);
 
-        return redirect()->route('kai-personalize.blacklists.index')
+        return redirect()->route('statamic.cp.kai-personalize.blacklists.index')
             ->with('success', __('kai-personalize::messages.blacklists.created'));
     }
 
@@ -66,7 +66,7 @@ class BlacklistController extends CpController
 
         $blacklist->update($validated);
 
-        return redirect()->route('kai-personalize.blacklists.index')
+        return redirect()->route('statamic.cp.kai-personalize.blacklists.index')
             ->with('success', __('kai-personalize::messages.blacklists.updated'));
     }
 
@@ -74,7 +74,7 @@ class BlacklistController extends CpController
     {
         $blacklist->delete();
 
-        return redirect()->route('kai-personalize.blacklists.index')
+        return redirect()->route('statamic.cp.kai-personalize.blacklists.index')
             ->with('success', __('kai-personalize::messages.blacklists.deleted'));
     }
 
