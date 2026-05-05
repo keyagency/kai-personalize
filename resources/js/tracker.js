@@ -21,6 +21,9 @@
         respectDnt: true,
     };
 
+    // Tracker version
+    const TRACKER_VERSION = '1.2.5';
+
     // ========== Tracker Queue Settings ==========
     // These can be overridden by server-side config via window.KaiConfig.queueSettings
     const queueSettings = Object.assign({
@@ -150,6 +153,7 @@
         const payload = {
             visitor_id: config.visitorId,
             session_id: config.sessionId,
+            tracker_version: TRACKER_VERSION,
             events: events,
         };
 
@@ -404,6 +408,12 @@
                 width: window.screen.width,
                 height: window.screen.height,
                 color_depth: window.screen.colorDepth,
+                available: {
+                    width: window.screen.availWidth,
+                    height: window.screen.availHeight,
+                },
+                device_pixel_ratio: window.devicePixelRatio,
+                orientation: window.innerWidth > window.innerHeight ? 'landscape' : 'portrait',
             },
             touch: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
             connection: navigator.connection ? {

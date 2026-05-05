@@ -244,6 +244,9 @@ class TrackVisitor
             return;
         }
 
+        // Store full user agent string
+        $this->setAttributeIfMissing($visitor, 'user_agent', $userAgent, 'technical');
+
         $agentService = new AgentService($userAgent);
 
         // Browser attributes - only set if not already present
@@ -322,6 +325,7 @@ class TrackVisitor
                 if (isset($location['latitude']) && isset($location['longitude'])) {
                     $this->setAttributeIfMissing($visitor, 'latitude', (string) $location['latitude'], 'external');
                     $this->setAttributeIfMissing($visitor, 'longitude', (string) $location['longitude'], 'external');
+                    $this->setAttributeIfMissing($visitor, 'google_maps_link', 'https://www.google.com/maps?q='.$location['latitude'].','.$location['longitude'], 'external');
                 }
             }
 

@@ -10,6 +10,16 @@ The format follows standard changelog conventions.
 - **Removed deprecated ScriptProcessorNode** - Removed audio fingerprinting to fix browser deprecation warning
 - Fingerprinting now uses Canvas + WebGL only (more reliable, no warnings)
 
+### Added
+- **Extended screen resolution data** - Added devicePixelRatio, orientation, and available screen size to device capabilities tracking
+- **Server-side user agent tracking** - Full browser user agent string now captured server-side for reliability
+- **Tracker version in payload** - Each tracking request now includes tracker version for debugging
+- **Google Maps link** - Added google_maps_link attribute when latitude/longitude is available
+
+### Fixed
+- **Removed deprecated ScriptProcessorNode** - Removed audio fingerprinting to fix browser deprecation warning
+- Fingerprinting now uses Canvas + WebGL only (more reliable, no warnings)
+
 ## 1.2.4 - 2026-05-05
 
 ### Added
