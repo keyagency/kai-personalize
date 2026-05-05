@@ -199,4 +199,11 @@ return [
         'cookie_name' => env('KAI_ACTIVECAMPAIGN_COOKIE', 'vgo_ee'),
         'cache_ttl' => env('KAI_ACTIVECAMPAIGN_CACHE_TTL', 1440), // 24 hours in minutes
     ],
+
+    // Bot blacklist configuration
+    'blacklist' => [
+        'enabled' => env('KAI_BLACKLIST_ENABLED', false),
+        'logging' => env('KAI_BLACKLIST_LOGGING', true),
+        'log_retention_days' => env('KAI_BLACKLIST_LOG_RETENTION', 30),
+    ],
 ];

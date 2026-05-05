@@ -11,6 +11,7 @@ use KeyAgency\KaiPersonalize\Models\Visitor;
 use KeyAgency\KaiPersonalize\Models\VisitorSession;
 use KeyAgency\KaiPersonalize\Services\ActiveCampaignService;
 use KeyAgency\KaiPersonalize\Services\AgentService;
+use KeyAgency\KaiPersonalize\Services\BlacklistService;
 use KeyAgency\KaiPersonalize\Services\MaxMindService;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
@@ -43,6 +44,15 @@ class TrackVisitor
             // Respect Do Not Track header
             if (config('kai-personalize.privacy.respect_dnt', true) && $request->header('DNT') === '1') {
                 return $next($request);
+            }
+
+            // Check blacklist (bots, monitoring tools, etc.)
+            if (config('kai-personalize.blacklist.enabled', false)) {
+                $blacklistService = app(BlacklistService::class);
+
+                if ($blacklistService->shouldBlock($request)) {
+                    return $next($request);
+                }
             }
 
             // Check if cookie consent is required and not given

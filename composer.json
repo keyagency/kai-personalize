@@ -29,6 +29,13 @@
             "KeyAgency\\KaiPersonalize\\Tests\\": "tests/"
         }
     },
+    "scripts": {
+        "build-js": [
+            "@php -r 'echo \"Building tracker.min.js...\";'",
+            "npm run build",
+            "@php -r 'echo \"\\nBuild complete!\";'"
+        ]
+    },
     "extra": {
         "statamic": {
             "name": "Kai Personalize",

@@ -13,7 +13,7 @@ use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
-    const VERSION = '1.1.2';
+    const VERSION = '1.2.0';
 
     protected $tags = [
         Kai::class,
@@ -103,6 +103,8 @@ class ServiceProvider extends AddonServiceProvider
                             ->route('kai-personalize.visitors.index'),
                         $nav->item(__('kai-personalize::messages.api_connections.title'))
                             ->route('kai-personalize.api-connections.index'),
+                        $nav->item(__('kai-personalize::messages.blacklists.title'))
+                            ->route('kai-personalize.blacklists.index'),
                         $nav->item(__('kai-personalize::messages.settings.title'))
                             ->route('kai-personalize.settings'),
                     ];
@@ -134,6 +136,9 @@ class ServiceProvider extends AddonServiceProvider
 
             Permission::register('manage kai-personalize api connections')
                 ->label(__('kai-personalize::messages.permissions.manage_api_connections'));
+
+            Permission::register('manage kai-personalize blacklists')
+                ->label(__('kai-personalize::messages.permissions.manage_blacklists'));
 
             Permission::register('manage kai-personalize settings')
                 ->label(__('kai-personalize::messages.permissions.manage_settings'));

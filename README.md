@@ -1,7 +1,7 @@
 # Kai Personalize - Statamic Add-on
 
 [![Statamic Marketplace](https://img.shields.io/badge/Statamic-Marketplace-orange.svg)](https://statamic.com/marketplace/addons/kai-personalize)
-[![Latest Version](https://img.shields.io/badge/version-v1.1.1-blue.svg)](https://github.com/keyagency/kai-personalize/releases)
+[![Latest Version](https://img.shields.io/badge/version-v1.2.0-blue.svg)](https://github.com/keyagency/kai-personalize/releases)
 
 **Adaptive content delivery based on visitor attributes and behavior**
 
@@ -49,11 +49,12 @@ Advanced features for growing businesses:
 | Engagement Scoring | ❌ | ✅ |
 | Dynamic Segments | ❌ | ✅ |
 | ActiveCampaign Integration | ❌ | ✅ |
+| Bot Blacklist | ✅ | ✅ |
 | Data Export | ❌ | ✅ |
 
 ## Current Status
 
-**Version:** v1.1.1 - Production Ready
+**Version:** v1.2.0 - Production Ready
 **Status:** All core features complete and functional. Now compatible with Statamic 6!
 
 ### ✅ What's Working Now:
@@ -87,6 +88,8 @@ Advanced features for growing businesses:
 - **Behavioral Tracking**: Monitor page views, time on site, referrers, and UTM parameters
 - **External API Integration**: Connect to weather, news, exchange rates, and custom APIs
 - **ActiveCampaign Integration**: Automatic email campaign visitor tracking and CRM data sync
+- **Bot Blacklist**: Block unwanted bots and monitoring tools from polluting your analytics
+- **Minified JavaScript**: Optimized tracker.js for faster page loads (62% smaller)
 - **Rule-Based Personalization**: Create complex conditions to show different content
 - **Privacy Compliant**: GDPR support, IP encryption, DNT respect, and data anonymization
 - **Multilingual**: Full English and Dutch support
@@ -169,6 +172,18 @@ mkdir -p storage/app/geoip
 # https://dev.maxmind.com/geoip/geolite2-free-geolocation-data
 # Place the .mmdb files in storage/app/geoip/
 ```
+
+6. (Optional) Build minified JavaScript:
+
+```bash
+# Install dependencies and build
+npm install && npm run build
+
+# Or use composer script
+composer run build-js
+```
+
+The minified `tracker.min.js` (~62% smaller) is served automatically when available. Rebuild after modifying `tracker.js`.
 
 ## Configuration
 
@@ -390,6 +405,93 @@ The default cookie name is `vgo_ee` but can be configured via `KAI_ACTIVECAMPAIG
 2. **Data retention** - Cache TTL respects AC rate limits (default 24 hours)
 3. **Right to be forgotten** - AC attributes are cleared when visitor data is deleted
 4. **Logging** - API calls are logged but sensitive data is masked
+
+## Bot Blacklist
+
+The blacklist feature allows you to block specific bots and monitoring tools from being tracked, keeping your analytics clean and focused on real visitors.
+
+### How It Works
+
+1. Blacklist entries are stored in the database and managed via the Control Panel
+2. When a request arrives, the blacklist service checks:
+   - Bot names (e.g., "semrush", "ahrefsbot")
+   - User agent patterns (e.g., "scrapy", "curl")
+3. Essential SEO bots are **always whitelisted** (Googlebot, Bingbot, etc.)
+4. Blocked requests skip tracking but still access the site normally
+5. All blocked requests are logged with hit counts for analysis
+
+### Configuration
+
+Add these settings to your `.env` file:
+
+```env
+# Enable blacklist feature
+KAI_BLACKLIST_ENABLED=true
+
+# Enable logging of blocked requests
+KAI_BLACKLIST_LOGGING=true
+
+# How long to keep blacklist logs (default: 30 days)
+KAI_BLACKLIST_LOG_RETENTION=30
+```
+
+### Default Blacklist
+
+The addon comes pre-seeded with common bots and tools:
+
+**SEO/Marketing Bots:**
+- Semrush, AhrefsBot, MJ12bot, DotBot
+
+**Monitoring/Uptime Services:**
+- UptimeRobot, Pingdom, StatusCake, Uptrends, Site24x7
+
+**AI Scrapers:**
+- ChatGPT, GPTBot, CCBot, Anthropic, Claude
+
+**User Agent Patterns:**
+- Scrapy, cURL, Wget, Python-requests, Go-http-client
+
+> **Note:** All pre-seeded entries are **inactive by default**. Enable them individually via the Control Panel.
+
+### Whitelist (Always Allowed)
+
+These bots are **never blocked**, regardless of blacklist settings:
+
+| Bot | Purpose |
+|-----|---------|
+| Googlebot | Google Search |
+| Bingbot | Bing Search |
+| Slurp | Yahoo Search |
+| DuckDuckBot | DuckDuckGo Search |
+| BaiduSpider | Baidu Search |
+| YandexBot | Yandex Search |
+| FacebookExternalHit | Facebook link previews |
+| TwitterBot | Twitter link previews |
+| LinkedInBot | LinkedIn link previews |
+
+### Management via Control Panel
+
+Navigate to **Kai Personalize > Blacklist** in your Control Panel to:
+
+1. **View all entries** - Type, pattern, description, status, hit count
+2. **Add new entries** - Bot name or user agent pattern
+3. **Toggle active status** - Click the badge to enable/disable
+4. **View logs** - See blocked requests with details
+5. **Edit/Delete entries** - Full CRUD operations
+
+### Seeding the Database
+
+To populate the default blacklist entries, run the seeder:
+
+```bash
+php artisan db:seed --class=KeyAgency\\\\KaiPersonalize\\\\Database\\\\Seeders\\\\BlacklistSeeder
+```
+
+Or add it to your main `DatabaseSeeder`:
+
+```php
+$this->call(BlacklistSeeder::class);
+```
 
 ## Browser Detection
 
@@ -801,6 +903,50 @@ When using the tracking endpoint, you must add CSRF token exceptions to `bootstr
 
 This allows the tracking JavaScript to POST events without CSRF tokens.
 
+## Cloudflare Configuration
+
+When using Cloudflare (or any reverse proxy/load balancer), you must configure trusted proxies to ensure correct IP address detection for visitor tracking.
+
+### Trusting Cloudflare Proxies
+
+Add the following to your `.env` file:
+
+```env
+# Trust all proxies (including Cloudflare)
+TRUSTED_PROXIES=*
+```
+
+Alternatively, you can specify Cloudflare's IP ranges explicitly:
+
+```env
+# Cloudflare IPv4 ranges
+TRUSTED_PROXIES=173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22
+```
+
+### Why This Is Needed
+
+Without trusting proxies, Laravel/Statamic will see Cloudflare's IP addresses instead of your visitors' real IP addresses, causing:
+
+- Incorrect geolocation data
+- All visitors appearing from the same location
+- Rate limiting to affect all users collectively
+- Visitor tracking to be less accurate
+
+### Verifying IP Detection
+
+After setting `TRUSTED_PROXIES`, verify that visitor IPs are correctly detected:
+
+```bash
+# Check your current IP
+curl https://ifconfig.me
+
+# In your Statamic app, check the detected IP
+# Add temporary debug code or use the kai:visitor tag
+{{ kai:visitor }}{{ ip_address }}{{ /kai:visitor }}
+```
+
+The IP displayed by the addon should match your actual IP address, not Cloudflare's.
+
 ## API Connections
 
 ### Built-in Providers
@@ -1084,11 +1230,11 @@ The addon tracks these behavioral events via the `kai:track` tag:
 ### Location-Based Content
 
 ```antlers
-{{ kai:condition attribute="country" operator="equals" value="NL" }}
-    <p>Welkom! Dit is Nederlandse content.</p>
+{{ kai:condition attribute="country" operator="equals" value="US" }}
+    <p>Welcome! This is US-specific content.</p>
 {{ /kai:condition }}
 
-{{ kai:condition attribute="country" operator="not_equals" value="NL" }}
+{{ kai:condition attribute="country" operator="not_equals" value="US" }}
     <p>Welcome! This is international content.</p>
 {{ /kai:condition }}
 ```

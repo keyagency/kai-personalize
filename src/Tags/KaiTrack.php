@@ -57,9 +57,7 @@ class KaiTrack extends Tags
     protected function renderTrackingScript(string $visitorId, string $sessionId, string $endpoint, array $features, bool $respectDnt): string
     {
         $featuresJson = json_encode($features);
-        $trackerUrl = route('kai-personalize.tracker');
 
-        // Queue settings from config
         $queueSettingsJson = json_encode([
             'threshold' => config('kai-personalize.queue.threshold', 5),
             'sendInterval' => config('kai-personalize.queue.send_interval', 20000),
@@ -68,9 +66,12 @@ class KaiTrack extends Tags
             'maxEventAge' => config('kai-personalize.queue.max_event_age', 3600000),
         ]);
 
+        $trackerUrl = env('KAI_TRACKER_MINIFIED', true)
+            ? route('kai-personalize.tracker-min')
+            : route('kai-personalize.tracker');
+
         return <<<JS
 <script>
-    // Kai Personalize - Tracker Configuration
     window.KaiConfig = {
         visitorId: '{$visitorId}',
         sessionId: '{$sessionId}',

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use KeyAgency\KaiPersonalize\Http\Controllers\ApiConnectionsController;
+use KeyAgency\KaiPersonalize\Http\Controllers\BlacklistController;
 use KeyAgency\KaiPersonalize\Http\Controllers\DashboardController;
 use KeyAgency\KaiPersonalize\Http\Controllers\PageAnalyticsController;
 use KeyAgency\KaiPersonalize\Http\Controllers\RulesController;
@@ -59,6 +60,18 @@ Route::prefix('kai-personalize')->name('kai-personalize.')->group(function () {
         Route::delete('/{id}', [ApiConnectionsController::class, 'destroy'])->name('destroy');
         Route::post('/{id}/test', [ApiConnectionsController::class, 'test'])->name('test');
         Route::delete('/{id}/cache', [ApiConnectionsController::class, 'clearCache'])->name('clear-cache');
+    });
+
+    // Blacklist Management
+    Route::prefix('blacklists')->name('blacklists.')->group(function () {
+        Route::get('/', [BlacklistController::class, 'index'])->name('index');
+        Route::get('/create', [BlacklistController::class, 'create'])->name('create');
+        Route::post('/', [BlacklistController::class, 'store'])->name('store');
+        Route::get('/{blacklist}/edit', [BlacklistController::class, 'edit'])->name('edit');
+        Route::put('/{blacklist}', [BlacklistController::class, 'update'])->name('update');
+        Route::delete('/{blacklist}', [BlacklistController::class, 'destroy'])->name('destroy');
+        Route::post('/{blacklist}/toggle', [BlacklistController::class, 'toggle'])->name('toggle');
+        Route::get('/{blacklist}/logs', [BlacklistController::class, 'logs'])->name('logs');
     });
 
     // Analytics

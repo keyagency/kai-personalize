@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format follows standard changelog conventions.
 
+## 1.2.0 - TBD
+
+### Added
+- **Bot Blacklist Feature**
+  - Database-driven blacklist management via Control Panel
+  - Block by bot name (e.g., Semrush, Ahrefs) or user agent pattern
+  - Whitelist for essential SEO bots (Googlebot, Bingbot, etc.)
+  - Automatic logging of blocked requests with hit counts
+  - Pre-seeded with common bots, monitoring tools, and AI scrapers
+  - Configuration: `KAI_BLACKLIST_ENABLED=false` (default off for safety)
+
+- **Tracker.js Minification**
+  - Automated build system using Terser
+  - File size reduction: 23KB → 8.7KB (~62% smaller)
+  - Automatic serving of minified version when available
+  - Build command: `composer run build-js` or `npm run build`
+
+### Changed
+- Updated README.md with Cloudflare configuration (TRUSTED_PROXIES)
+
 ## 1.1.2 - 2026-03-22
 
 ### Changed

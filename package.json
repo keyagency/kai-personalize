@@ -1,0 +1,16 @@
+{
+  "name": "kai-personalize",
+  "version": "1.2.0",
+  "description": "Kai Personalize - Behavioral tracking JavaScript",
+  "private": true,
+  "scripts": {
+    "build": "terser resources/js/tracker.js -c -m -o resources/js/tracker.min.js --comments '/!/'"
+  },
+  "devDependencies": {
+    "terser": "^5.36.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
