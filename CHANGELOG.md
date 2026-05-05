@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format follows standard changelog conventions.
 
+## 1.2.3 - 2026-05-05
+
+### Fixed
+- **PSR-4 autoloading** - Renamed `src/database/` to `src/Database/` for proper PSR-4 compliance
+
 ## 1.2.2 - 2026-05-05
 
 ### Fixed

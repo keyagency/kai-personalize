@@ -13,7 +13,7 @@ use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
-    const VERSION = '1.2.2';
+    const VERSION = '1.2.3';
 
     protected $tags = [
         Kai::class,
