@@ -486,13 +486,11 @@
         Promise.all([
             getCanvasHash(),
             getWebGLHash(),
-            getAudioHash(),
-        ]).then(([canvas, webgl, audio]) => {
+        ]).then(([canvas, webgl]) => {
             const components = [];
 
             if (canvas) components.push(canvas);
             if (webgl) components.push(webgl);
-            if (audio) components.push(audio);
 
             // Add screen properties
             components.push(window.screen.width + 'x' + window.screen.height);
@@ -551,42 +549,6 @@
             const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
 
             return vendor + '|' + renderer;
-        } catch {
-            return null;
-        }
-    }
-
-    async function getAudioHash() {
-        try {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const analyser = audioContext.createAnalyser();
-            const gain = audioContext.createGain();
-            const processor = audioContext.createScriptProcessor(4096, 1, 1);
-
-            gain.gain.value = 0; // Mute output
-            oscillator.type = 'triangle';
-            oscillator.frequency.value = 10000;
-
-            oscillator.connect(analyser);
-            analyser.connect(processor);
-            processor.connect(gain);
-            gain.connect(audioContext.destination);
-
-            oscillator.start(0);
-
-            return new Promise((resolve) => {
-                processor.onaudioprocess = (e) => {
-                    const data = e.inputBuffer.getChannelData(0);
-                    let sum = 0;
-                    for (let i = 0; i < data.length; i++) {
-                        sum += Math.abs(data[i]);
-                    }
-                    oscillator.stop();
-                    audioContext.close();
-                    resolve(sum.toString().slice(0, 10));
-                };
-            });
         } catch {
             return null;
         }

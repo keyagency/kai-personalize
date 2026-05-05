@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format follows standard changelog conventions.
 
+## 1.2.5 - 2026-05-05
+
+### Fixed
+- **Removed deprecated ScriptProcessorNode** - Removed audio fingerprinting to fix browser deprecation warning
+- Fingerprinting now uses Canvas + WebGL only (more reliable, no warnings)
+
 ## 1.2.4 - 2026-05-05
 
 ### Added
