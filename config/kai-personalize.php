@@ -27,6 +27,12 @@ return [
         'video_tracking' => env('KAI_PERSONALIZE_VIDEO_TRACKING', false),
     ],
 
+    // Blacklist settings
+    'blacklist' => [
+        'enabled' => env('KAI_BLACKLIST_ENABLED', true),
+        'logging' => env('KAI_BLACKLIST_LOGGING', true),
+    ],
+
     // Privacy settings
     'privacy' => [
         'encrypt_ip' => true,

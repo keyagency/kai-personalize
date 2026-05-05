@@ -173,6 +173,8 @@
                     <span class="badge {{ $config['features']['page_view_tracking'] ? 'badge-success' : 'badge-neutral' }}">Page View Tracking</span>
                     <span class="badge {{ $config['features']['external_data'] ? 'badge-success' : 'badge-neutral' }}">External Data</span>
                     <span class="badge {{ $config['features']['activecampaign'] ? 'badge-success' : 'badge-neutral' }}">ActiveCampaign</span>
+                    <span class="badge {{ $config['blacklist']['enabled'] ? 'badge-success' : 'badge-neutral' }}">Blacklist</span>
+                    <span class="badge {{ $config['blacklist']['logging'] ? 'badge-success' : 'badge-neutral' }}">Blacklist Logging</span>
                 </div>
 
                 <h3 class="kai-section-title">JavaScript Tracking Features</h3>

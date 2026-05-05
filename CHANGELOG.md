@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format follows standard changelog conventions.
 
+## 1.2.4 - 2026-05-05
+
+### Added
+- **Blacklist settings to config** - Added `blacklist.enabled` and `blacklist.logging` configuration options
+- **Settings page badges** - Added visual indicators for Blacklist and Blacklist Logging features
+
 ## 1.2.3 - 2026-05-05
 
 ### Fixed
