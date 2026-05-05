@@ -49,6 +49,8 @@ return [
         'allowed_origins' => env('KAI_TRACKING_ALLOWED_ORIGINS')
             ? explode(',', env('KAI_TRACKING_ALLOWED_ORIGINS'))
             : [],
+        // Use minified JavaScript for tracker (recommended for production)
+        'use_minified_js' => env('KAI_USE_MINIFIED_JS', true),
     ],
 
     // Session configuration (extends Laravel session)

@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format follows standard changelog conventions.
 
+## 1.2.1 - 2026-05-05
+
+### Added
+- **Config option for tracker.js minification** - `KAI_USE_MINIFIED_JS` env var to control minified vs regular tracker
+
+### Changed
+- Updated blacklist CP views to use Statamic form layout conventions
+- Fixed BlacklistController to extend Statamic CpController
+
 ## 1.2.0 - TBD
 
 ### Added

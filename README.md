@@ -1,7 +1,7 @@
 # Kai Personalize - Statamic Add-on
 
 [![Statamic Marketplace](https://img.shields.io/badge/Statamic-Marketplace-orange.svg)](https://statamic.com/marketplace/addons/kai-personalize)
-[![Latest Version](https://img.shields.io/badge/version-v1.2.0-blue.svg)](https://github.com/keyagency/kai-personalize/releases)
+[![Latest Version](https://img.shields.io/badge/version-v1.2.1-blue.svg)](https://github.com/keyagency/kai-personalize/releases)
 
 **Adaptive content delivery based on visitor attributes and behavior**
 
@@ -54,7 +54,7 @@ Advanced features for growing businesses:
 
 ## Current Status
 
-**Version:** v1.2.0 - Production Ready
+**Version:** v1.2.1 - Production Ready
 **Status:** All core features complete and functional. Now compatible with Statamic 6!
 
 ### ✅ What's Working Now:
@@ -160,6 +160,14 @@ KAI_QUEUE_MAX_EVENT_AGE=3600000
 # Security (optional but recommended for production)
 KAI_TRACKING_SECRET=your-unique-secret-key-here
 KAI_TRACKING_ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+
+# Bot Blacklist Configuration
+KAI_BLACKLIST_ENABLED=false
+KAI_BLACKLIST_LOGGING=true
+KAI_BLACKLIST_LOG_RETENTION=30
+
+# JavaScript tracker (use minified version by default)
+KAI_USE_MINIFIED_JS=true
 ```
 
 5. (Optional) Set up MaxMind GeoIP2 for local geolocation:

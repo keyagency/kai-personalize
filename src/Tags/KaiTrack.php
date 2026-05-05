@@ -66,7 +66,7 @@ class KaiTrack extends Tags
             'maxEventAge' => config('kai-personalize.queue.max_event_age', 3600000),
         ]);
 
-        $trackerUrl = env('KAI_TRACKER_MINIFIED', true)
+        $trackerUrl = config('kai-personalize.tracking.use_minified_js', true)
             ? route('kai-personalize.tracker-min')
             : route('kai-personalize.tracker');
 
