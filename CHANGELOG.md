@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format follows standard changelog conventions.
 
-## 1.2.5 - 2026-05-05
+## 1.2.6 (2026-06-08)
+
+### Fixed
+- **Config deep merge** - ServiceProvider now uses `array_replace_recursive()` instead of `mergeConfigFrom()` so missing nested config keys are always filled with addon defaults
+
+## 1.2.5 (2026-05-05)
 
 ### Fixed
 - **Removed deprecated ScriptProcessorNode** - Removed audio fingerprinting to fix browser deprecation warning
@@ -20,24 +25,24 @@ The format follows standard changelog conventions.
 - **Removed deprecated ScriptProcessorNode** - Removed audio fingerprinting to fix browser deprecation warning
 - Fingerprinting now uses Canvas + WebGL only (more reliable, no warnings)
 
-## 1.2.4 - 2026-05-05
+## 1.2.4 (2026-05-05)
 
 ### Added
 - **Blacklist settings to config** - Added `blacklist.enabled` and `blacklist.logging` configuration options
 - **Settings page badges** - Added visual indicators for Blacklist and Blacklist Logging features
 
-## 1.2.3 - 2026-05-05
+## 1.2.3 (2026-05-05)
 
 ### Fixed
 - **PSR-4 autoloading** - Renamed `src/database/` to `src/Database/` for proper PSR-4 compliance
 
-## 1.2.2 - 2026-05-05
+## 1.2.2 (2026-05-05)
 
 ### Fixed
 - **BlacklistSeeder autoloading** - Moved from `database/seeders/` to `src/Database/Seeders/` for proper PSR-4 autoloading
 - Added `php artisan kai:seed-blacklist` command for easy database seeding
 
-## 1.2.1 - 2026-05-05
+## 1.2.1 (2026-05-05)
 
 ### Added
 - **Config option for tracker.js minification** - `KAI_USE_MINIFIED_JS` env var to control minified vs regular tracker
@@ -46,7 +51,7 @@ The format follows standard changelog conventions.
 - Updated blacklist CP views to use Statamic form layout conventions
 - Fixed BlacklistController to extend Statamic CpController
 
-## 1.2.0 - 2026-05-04
+## 1.2.0 (2026-05-04)
 
 ### Added
 - **Bot Blacklist Feature**
@@ -66,13 +71,13 @@ The format follows standard changelog conventions.
 ### Changed
 - Updated README.md with Cloudflare configuration (TRUSTED_PROXIES)
 
-## 1.1.2 - 2026-03-22
+## 1.1.2 (2026-03-22)
 
 ### Changed
 - Small bug fixes and documentation updates
 - Version updates for Statamic cache fix
 
-## 1.1.1 - 2026-03-20
+## 1.1.1 (2026-03-20)
 
 ### Changed
 - **Edition Rename**: "Free" edition renamed to "Lite" edition
@@ -84,7 +89,7 @@ The format follows standard changelog conventions.
 ### Added
 - Separate CHANGELOG.md file (moved from README.md)
 
-## 1.1.0 - 2026-03-20
+## 1.1.0 (2026-03-20)
 
 ### Added
 - **Core Features**

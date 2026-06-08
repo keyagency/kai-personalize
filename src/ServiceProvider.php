@@ -13,7 +13,7 @@ use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
-    const VERSION = '1.2.5';
+    const VERSION = '1.2.6';
 
     protected $tags = [
         Kai::class,
@@ -52,10 +52,12 @@ class ServiceProvider extends AddonServiceProvider
 
     public function register()
     {
-        // Register config early so we can check enabled flag in boot()
-        $this->mergeConfigFrom(
-            __DIR__.'/../config/kai-personalize.php', 'kai-personalize'
-        );
+        // Deep merge: project config overrides addon defaults at every nesting level.
+        // Unlike mergeConfigFrom() which only does a shallow top-level merge, this
+        // ensures missing nested keys always fall back to the addon's own defaults.
+        $addonDefaults = require __DIR__.'/../config/kai-personalize.php';
+        $projectConfig = $this->app['config']->get('kai-personalize', []);
+        $this->app['config']->set('kai-personalize', array_replace_recursive($addonDefaults, $projectConfig));
     }
 
     public function bootAddon()
