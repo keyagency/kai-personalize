@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format follows standard changelog conventions.
 
+## 1.2.7 (2026-06-08)
+
+### Fixed
+- **Git tags for marketplace releases** - Added v1.2.x tags with proper "v" prefix for Statamic marketplace compatibility
+
 ## 1.2.6 (2026-06-08)
 
 ### Fixed
