@@ -1,7 +1,7 @@
 # Kai Personalize - Statamic Add-on
 
-[![Statamic Marketplace](https://img.shields.io/badge/Statamic-Marketplace-orange.svg)](https://statamic.com/marketplace/addons/kai-personalize)
-[![Latest Version](https://img.shields.io/badge/version-v1.2.1-blue.svg)](https://github.com/keyagency/kai-personalize/releases)
+[![Statamic Marketplace](https://img.shields.io/badge/Statamic-Marketplace-orange.svg)](https://statamic.com/addons/key-agency/kai-personalize)
+[![Latest Version](https://img.shields.io/github/v/release/keyagency/kai-personalize?label=version&color=blue)](https://github.com/keyagency/kai-personalize/releases)
 
 **Adaptive content delivery based on visitor attributes and behavior**
 
@@ -54,8 +54,8 @@ Advanced features for growing businesses:
 
 ## Current Status
 
-**Version:** v1.2.1 - Production Ready
 **Status:** All core features complete and functional. Now compatible with Statamic 6!
+See the version badge above for the current release, and [CHANGELOG.md](CHANGELOG.md) for what changed.
 
 ### ✅ What's Working Now:
 - ✅ Visitor tracking (server-side)
@@ -161,10 +161,11 @@ KAI_QUEUE_MAX_EVENT_AGE=3600000
 KAI_TRACKING_SECRET=your-unique-secret-key-here
 KAI_TRACKING_ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
 
-# Bot Blacklist Configuration
-KAI_BLACKLIST_ENABLED=false
+# Bot Blacklist Configuration (enabled by default since 1.2.8)
+KAI_BLACKLIST_ENABLED=true
 KAI_BLACKLIST_LOGGING=true
 KAI_BLACKLIST_LOG_RETENTION=30
+KAI_SKIP_KNOWN_BOTS=true
 
 # JavaScript tracker (use minified version by default)
 KAI_USE_MINIFIED_JS=true
@@ -418,6 +419,11 @@ The default cookie name is `vgo_ee` but can be configured via `KAI_ACTIVECAMPAIG
 
 The blacklist feature allows you to block specific bots and monitoring tools from being tracked, keeping your analytics clean and focused on real visitors.
 
+> **Upgrading to 1.2.8?** Two things changed here:
+>
+> 1. **The blacklist is now on by default.** Prior to 1.2.8 a duplicate `blacklist` key in the config silently forced it off, so it was inactive even if you thought otherwise. Set `KAI_BLACKLIST_ENABLED=false` if you want the old behaviour.
+> 2. **If you published the config before 1.2.4**, your `config/kai-personalize.php` has no `blacklist` key at all. Republish it with `php artisan vendor:publish --tag=kai-personalize-config --force` so the new options are present.
+
 ### How It Works
 
 1. Blacklist entries are stored in the database and managed via the Control Panel
@@ -425,15 +431,20 @@ The blacklist feature allows you to block specific bots and monitoring tools fro
    - Bot names (e.g., "semrush", "ahrefsbot")
    - User agent patterns (e.g., "scrapy", "curl")
 3. Essential SEO bots are **always whitelisted** (Googlebot, Bingbot, etc.)
-4. Blocked requests skip tracking but still access the site normally
-5. All blocked requests are logged with hit counts for analysis
+4. If `KAI_SKIP_KNOWN_BOTS` is on, any remaining user agent the parser recognises as a bot is skipped too, so you do not have to maintain a pattern for every crawler
+5. Blocked requests skip tracking but still access the site normally
+6. Requests matching a blacklist entry are logged with hit counts for analysis
+
+The blacklist check runs **before** the entry lookup, so bot traffic never pays for resolving a Statamic entry. Patterns are cached (10 minutes by default) and the cache is invalidated automatically when you add, edit or delete an entry.
+
+> **Why this matters:** on a production site we measured 18% of all tracked visitors as recognised bots, each generating a visitor row plus ~29 attribute rows. Leaving the blacklist off is the single largest source of database growth.
 
 ### Configuration
 
 Add these settings to your `.env` file:
 
 ```env
-# Enable blacklist feature
+# Enable blacklist feature (default: true since 1.2.8)
 KAI_BLACKLIST_ENABLED=true
 
 # Enable logging of blocked requests
@@ -441,6 +452,13 @@ KAI_BLACKLIST_LOGGING=true
 
 # How long to keep blacklist logs (default: 30 days)
 KAI_BLACKLIST_LOG_RETENTION=30
+
+# Also skip user agents the parser recognises as a bot, without needing
+# a pattern for each one. The SEO whitelist still takes precedence. (default: true)
+KAI_SKIP_KNOWN_BOTS=true
+
+# Seconds to cache active patterns (default: 600)
+KAI_BLACKLIST_PATTERN_CACHE_TTL=600
 ```
 
 ### Default Blacklist
@@ -592,12 +610,21 @@ Get information about the current visitor:
     {{ timezone }}
     {{ continent }}
     {{ is_eu }}
+    {{ latitude }}
+    {{ longitude }}
+    {{ google_maps_link }}     {{# Derived from the coordinates #}}
+
+    {{# Time-based (derived on read, never stored) #}}
+    {{ time_of_day }}          {{# Current hour: 00-23 #}}
+    {{ day_of_week }}          {{# 0 (Sunday) - 6 (Saturday) #}}
 
     {{# Traffic source #}}
     {{ referrer }}
     {{ utm_source }}
     {{ utm_medium }}
     {{ utm_campaign }}
+    {{ utm_term }}
+    {{ utm_content }}
 
     {{# Languages #}}
     {{ language }}
@@ -616,6 +643,8 @@ Get information about the current visitor:
     {{ ac_updated_at }}
 {{ /kai:visitor }}
 ```
+
+> **Derived values (since 1.2.8):** `google_maps_link`, `time_of_day` and `day_of_week` are computed when you read them instead of being written to the database. They behave exactly as before in your templates, but no longer cost a row per visitor. `time_of_day` and `day_of_week` were already computed live by `kai:condition` and `kai:content`, so storing them was pure overhead — they were rewritten on every single page view.
 
 ### kai:condition
 

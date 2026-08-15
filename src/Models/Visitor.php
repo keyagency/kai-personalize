@@ -24,6 +24,13 @@ class Visitor extends Model
         'visit_count' => 'integer',
     ];
 
+    /**
+     * Attribute types accepted by the attribute_type enum column.
+     * Anything outside this list is stored as 'external' so an unknown
+     * type can never truncate the column under MySQL strict mode.
+     */
+    public const ATTRIBUTE_TYPES = ['personal', 'computed', 'external', 'technical'];
+
     public function sessions(): HasMany
     {
         return $this->hasMany(VisitorSession::class);
@@ -112,9 +119,21 @@ class Visitor extends Model
 
     /**
      * Set visitor attribute value
+     *
+     * Empty values are never stored: attribute_value is NOT NULL, and an
+     * absent value carries no meaning worth a row. Returns null when the
+     * value was rejected.
      */
-    public function setVisitorAttribute(string $key, $value, ?string $type = 'personal', ?\DateTimeInterface $expiresAt = null, ?int $sessionId = null): VisitorAttribute
+    public function setVisitorAttribute(string $key, $value, ?string $type = 'personal', ?\DateTimeInterface $expiresAt = null, ?int $sessionId = null): ?VisitorAttribute
     {
+        if ($value === null || $value === [] || (is_string($value) && trim($value) === '')) {
+            return null;
+        }
+
+        if (! in_array($type, self::ATTRIBUTE_TYPES, true)) {
+            $type = 'external';
+        }
+
         $matchCriteria = ['attribute_key' => $key];
 
         if ($sessionId !== null) {

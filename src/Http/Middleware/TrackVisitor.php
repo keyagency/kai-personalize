@@ -30,11 +30,6 @@ class TrackVisitor
             return $next($request);
         }
 
-        // Only track collection entries (pages, cases, articles, etc.)
-        if (! $this->isCollectionEntry($request)) {
-            return $next($request);
-        }
-
         try {
             // Skip tracking if fingerprinting is disabled
             if (! config('kai-personalize.features.fingerprinting', false)) {
@@ -46,8 +41,10 @@ class TrackVisitor
                 return $next($request);
             }
 
-            // Check blacklist (bots, monitoring tools, etc.)
-            if (config('kai-personalize.blacklist.enabled', false)) {
+            // Check blacklist (bots, monitoring tools, etc.). Deliberately before
+            // isCollectionEntry(): resolving an entry is the expensive part, and
+            // bot traffic should never pay for it.
+            if (config('kai-personalize.blacklist.enabled', true)) {
                 $blacklistService = app(BlacklistService::class);
 
                 if ($blacklistService->shouldBlock($request)) {
@@ -57,6 +54,11 @@ class TrackVisitor
 
             // Check if cookie consent is required and not given
             if (config('kai-personalize.privacy.cookie_consent_required', false) && ! $this->hasConsent($request)) {
+                return $next($request);
+            }
+
+            // Only track collection entries (pages, cases, articles, etc.)
+            if (! $this->isCollectionEntry($request)) {
                 return $next($request);
             }
 
@@ -92,14 +94,15 @@ class TrackVisitor
                 Session::put(config('kai-personalize.session.visitor_id_key', 'kai_visitor_id'), $fingerprintHash);
                 Session::put(config('kai-personalize.session.session_id_key', 'kai_session_id'), $visitorSession->id);
 
+                // Page views first: they are the primary signal, and must not be
+                // lost to a failure while collecting secondary attributes.
+                if (config('kai-personalize.features.page_view_tracking', true)) {
+                    $this->trackPageView($request, $visitor, $visitorSession);
+                }
+
                 // Collect additional attributes if behavioral tracking is enabled
                 if (config('kai-personalize.features.behavioral_tracking', true)) {
                     $this->collectAttributes($request, $visitor, $visitorSession);
-                }
-
-                // Track individual page view if feature is enabled
-                if (config('kai-personalize.features.page_view_tracking', true)) {
-                    $this->trackPageView($request, $visitor, $visitorSession);
                 }
             }
         } catch (\Exception $e) {
@@ -197,38 +200,67 @@ class TrackVisitor
     {
         $sessionId = $visitorSession->id;
 
-        // Collect referrer (session-scoped)
-        if ($referrer = $request->header('referer')) {
-            $visitor->setVisitorAttribute('referrer', $referrer, 'personal', null, $sessionId);
-        }
+        // Each collector is isolated: a failure in one must not cost us the others.
+        $this->safely('campaign', function () use ($request, $visitor, $sessionId) {
+            $this->collectCampaignAttributes($request, $visitor, $sessionId);
+        });
 
-        // Collect UTM parameters (session-scoped)
-        $utmParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
-        foreach ($utmParams as $param) {
-            if ($request->has($param)) {
-                $visitor->setVisitorAttribute($param, $request->get($param), 'personal', null, $sessionId);
-            }
-        }
+        $this->safely('language', function () use ($visitor) {
+            $visitor->setVisitorAttribute('language', app()->getLocale(), 'personal');
+        });
 
-        // Collect language
-        $locale = app()->getLocale();
-        $visitor->setVisitorAttribute('language', $locale, 'personal');
+        $this->safely('agent', function () use ($request, $visitor) {
+            $this->collectAgentAttributes($request, $visitor);
+        });
 
-        // Collect time-based attributes
-        $visitor->setVisitorAttribute('time_of_day', now()->format('H'), 'personal');
-        $visitor->setVisitorAttribute('day_of_week', now()->dayOfWeek, 'personal');
-
-        // Collect browser/agent attributes
-        $this->collectAgentAttributes($request, $visitor);
-
-        // Collect geolocation attributes (if enabled and IP tracking is on)
         if (config('kai-personalize.features.geolocation', true) && config('kai-personalize.features.ip_tracking', true)) {
-            $this->collectGeolocationAttributes($request, $visitor);
+            $this->safely('geolocation', function () use ($request, $visitor) {
+                $this->collectGeolocationAttributes($request, $visitor);
+            });
         }
 
-        // Collect ActiveCampaign attributes (if enabled)
         if (config('kai-personalize.features.activecampaign', false)) {
-            $this->collectActiveCampaignAttributes($visitor);
+            $this->safely('activecampaign', function () use ($visitor) {
+                $this->collectActiveCampaignAttributes($visitor);
+            });
+        }
+    }
+
+    /**
+     * Run a collector, logging any failure without aborting the rest.
+     */
+    protected function safely(string $collector, callable $callback): void
+    {
+        try {
+            $callback();
+        } catch (\Throwable $e) {
+            Log::warning("Kai Personalize {$collector} attribute error: ".$e->getMessage(), [
+                'exception' => $e,
+            ]);
+        }
+    }
+
+    /**
+     * Collect referrer and UTM parameters (session-scoped)
+     */
+    protected function collectCampaignAttributes(Request $request, Visitor $visitor, ?int $sessionId): void
+    {
+        $referrer = $request->header('referer');
+
+        if (is_string($referrer) && trim($referrer) !== '') {
+            $visitor->setVisitorAttribute('referrer', mb_substr(trim($referrer), 0, 512), 'personal', null, $sessionId);
+        }
+
+        foreach (['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'] as $param) {
+            // query() ignores the request body, and the is_string check rejects
+            // both ?utm_term= (null after ConvertEmptyStringsToNull) and ?utm_term[]=x.
+            $value = $request->query($param);
+
+            if (! is_string($value) || trim($value) === '') {
+                continue;
+            }
+
+            $visitor->setVisitorAttribute($param, mb_substr(trim($value), 0, 255), 'personal', null, $sessionId);
         }
     }
 
@@ -296,7 +328,7 @@ class TrackVisitor
         }
 
         try {
-            $maxmind = new MaxMindService;
+            $maxmind = app(MaxMindService::class);
 
             if (! $maxmind->isAvailable()) {
                 return;
@@ -323,9 +355,9 @@ class TrackVisitor
             // Store coordinates if available (and privacy allows)
             if (! config('kai-personalize.privacy.gdpr_mode', false)) {
                 if (isset($location['latitude']) && isset($location['longitude'])) {
+                    // google_maps_link is derived from these two on read, not stored.
                     $this->setAttributeIfMissing($visitor, 'latitude', (string) $location['latitude'], 'external');
                     $this->setAttributeIfMissing($visitor, 'longitude', (string) $location['longitude'], 'external');
-                    $this->setAttributeIfMissing($visitor, 'google_maps_link', 'https://www.google.com/maps?q='.$location['latitude'].','.$location['longitude'], 'external');
                 }
             }
 

@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.8 (2026-08-15)
+
+- [fix] **Tracking crashed on empty UTM parameters** - `?utm_term=` (as Google Ads appends) produced `Column 'attribute_value' cannot be null`, which aborted the rest of the request's tracking: language, device attributes, geolocation and the page view were all silently lost. Empty and non-string values are now skipped
+- [fix] **Attribute writes no longer accept empty values** - `Visitor::setVisitorAttribute()` rejects null, empty strings and empty arrays, and maps unknown attribute types to `external` so an out-of-enum type (such as `crm`) can no longer truncate the column
+- [fix] **One failing collector no longer wipes the rest** - page views are recorded before attributes, and each collector (campaign, language, agent, geolocation, ActiveCampaign) is isolated so a failure in one is logged without losing the others
+- [fix] **Duplicate `blacklist` config key** - the key was defined twice in `config/kai-personalize.php` and the second definition silently won, leaving the bot filter off. **The default of `blacklist.enabled` is now `true`** - set `KAI_BLACKLIST_ENABLED=false` to keep the old behaviour, and republish the config with `php artisan vendor:publish --tag=kai-personalize-config --force`
+- [new] **`blacklist.skip_known_bots`** - skips visitors the user agent parser recognises as a bot, without relying on hand-maintained patterns. The SEO whitelist still takes precedence
+- [changed] **Bot check runs before entry resolution** - blacklisted traffic no longer pays for the expensive Statamic entry lookup
+- [changed] **Derived attributes are no longer stored** - `time_of_day`, `day_of_week` and `google_maps_link` are computed on read. The first two were already computed live by the tags, and were being written on every single page view
+- [changed] **Blacklist patterns are cached** and `MaxMindService` / `BlacklistService` are singletons, removing repeated queries and three `.mmdb` reader instantiations per request
+- [new] `{{ kai:visitor }}` now exposes `latitude`, `longitude`, `google_maps_link`, `time_of_day` and `day_of_week`
+
 ## 1.2.7 (2026-06-08)
 
 - [fix] **Git tags for marketplace releases** - Added v1.2.x tags with proper "v" prefix for Statamic marketplace compatibility

@@ -34,6 +34,9 @@ class KaiVisitor extends Tags
         // Get agent attributes from stored data or parse live
         $agentData = $this->getAgentData($visitor, $userAgent);
 
+        $latitude = $visitor->getVisitorAttribute('latitude');
+        $longitude = $visitor->getVisitorAttribute('longitude');
+
         return array_merge([
             'fingerprint' => $visitor->fingerprint_hash,
             'session_id' => $currentSession?->session_id,
@@ -48,6 +51,13 @@ class KaiVisitor extends Tags
             'country' => $visitor->getVisitorAttribute('country'),
             'city' => $visitor->getVisitorAttribute('city'),
             'region' => $visitor->getVisitorAttribute('region'),
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'google_maps_link' => $this->googleMapsLink($latitude, $longitude),
+
+            // Time-based (derived on read, never stored)
+            'time_of_day' => now()->format('H'),
+            'day_of_week' => now()->dayOfWeek,
 
             // User preferences
             'language' => $visitor->getVisitorAttribute('language'),
@@ -76,6 +86,19 @@ class KaiVisitor extends Tags
     }
 
     /**
+     * Build a Google Maps link from stored coordinates.
+     * Derived on read so the link never occupies a row of its own.
+     */
+    protected function googleMapsLink($latitude, $longitude): ?string
+    {
+        if ($latitude === null || $longitude === null || $latitude === '' || $longitude === '') {
+            return null;
+        }
+
+        return 'https://www.google.com/maps?q='.$latitude.','.$longitude;
+    }
+
+    /**
      * Get anonymous visitor data
      */
     protected function getAnonymousVisitorData(): array
@@ -97,6 +120,13 @@ class KaiVisitor extends Tags
             'country' => null,
             'city' => null,
             'region' => null,
+            'latitude' => null,
+            'longitude' => null,
+            'google_maps_link' => null,
+
+            // Time-based (derived on read, never stored)
+            'time_of_day' => now()->format('H'),
+            'day_of_week' => now()->dayOfWeek,
 
             // User preferences
             'language' => app()->getLocale(),

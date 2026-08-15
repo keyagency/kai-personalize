@@ -198,19 +198,37 @@ Update the VERSION constant when:
 When making changes that require a version update:
 
 ```bash
-# 1. Update VERSION constant in src/ServiceProvider.php
-# 2. Update README.md changelog
-# 3. Commit the changes
-git add src/ServiceProvider.php README.md
+# 1. Update the VERSION constant in src/ServiceProvider.php
+# 2. Add a CHANGELOG.md section in the Statamic marketplace format (see below)
+# 3. Commit everything
+git add -A
 git commit -m "Bump version to 1.2.0
 
 - Add new feature X
 - Fix bug Y"
 
-# 4. Create git tag for release
+# 4. Tag — the "v" prefix is required for the Statamic marketplace
 git tag v1.2.0
 git push origin main --tags
+
+# 5. Publish the GitHub release; the body IS the changelog section for
+#    that version (without the heading). This is what the marketplace shows.
+gh release create v1.2.0 --title "v1.2.0" --notes-file /path/to/section.md
 ```
+
+**CHANGELOG.md format** — Statamic renders these badges coloured on the addon page, so the prefixes matter:
+
+```markdown
+## 1.2.0 (2026-01-15)
+
+- [new] **Short bold title** - Longer explanation
+- [fix] **Short bold title** - Longer explanation
+- [changed] ...
+- [breaking] ...
+```
+
+**Do not hardcode the version anywhere else.** The README version badge reads the latest GitHub release dynamically:
+`https://img.shields.io/github/v/release/keyagency/kai-personalize`. It used to be a hardcoded badge and sat at v1.2.1 for seven releases, which is what the marketplace displayed. This only works while the repo is public.
 
 ### Version Bump Guidelines
 - **Patch (1.1.0 → 1.1.1):** Bug fixes, small improvements, no breaking changes
@@ -252,7 +270,7 @@ The ActiveCampaign service automatically identifies email campaign visitors:
 1. User clicks link in ActiveCampaign email → arrives with tracking cookie (`vgo_ee`)
 2. `TrackVisitor` middleware detects cookie and calls `ActiveCampaignService`
 3. Service fetches contact data (tags, lists, custom fields)
-4. Data stored as `crm` type visitor attributes
+4. Data stored as visitor attributes (requested as type `crm`, stored as `external` — `crm` is not in the `attribute_type` enum, so `Visitor::setVisitorAttribute()` maps unknown types to `external` rather than letting MySQL truncate the column)
 5. Available in templates via `{{ kai:visitor }}`
 
 **Stored attributes:**

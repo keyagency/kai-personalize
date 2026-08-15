@@ -13,7 +13,7 @@ use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
-    const VERSION = '1.2.7';
+    const VERSION = '1.2.8';
 
     protected $tags = [
         Kai::class,
@@ -58,6 +58,11 @@ class ServiceProvider extends AddonServiceProvider
         $addonDefaults = require __DIR__.'/../config/kai-personalize.php';
         $projectConfig = $this->app['config']->get('kai-personalize', []);
         $this->app['config']->set('kai-personalize', array_replace_recursive($addonDefaults, $projectConfig));
+
+        // Both are stateless and expensive to build per request: MaxMindService
+        // opens three .mmdb readers, BlacklistService is hit on every request.
+        $this->app->singleton(Services\MaxMindService::class);
+        $this->app->singleton(Services\BlacklistService::class);
     }
 
     public function bootAddon()

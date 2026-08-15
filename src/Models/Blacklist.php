@@ -4,6 +4,7 @@ namespace KeyAgency\KaiPersonalize\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Cache;
 
 class Blacklist extends Model
 {
@@ -22,6 +23,34 @@ class Blacklist extends Model
         'is_active' => 'boolean',
         'last_hit_at' => 'datetime',
     ];
+
+    /**
+     * Keys cached by BlacklistService::activePatterns().
+     */
+    public const PATTERN_CACHE_KEYS = [
+        'kai:blacklist:patterns:bot_name',
+        'kai:blacklist:patterns:user_agent',
+    ];
+
+    protected static function booted(): void
+    {
+        // Only a change to what we match on invalidates the cache — hit counters
+        // are written on every blocked request and must not flush it.
+        static::saved(function (self $blacklist) {
+            if ($blacklist->wasChanged(['type', 'pattern', 'is_active']) || $blacklist->wasRecentlyCreated) {
+                static::forgetPatternCache();
+            }
+        });
+
+        static::deleted(fn () => static::forgetPatternCache());
+    }
+
+    public static function forgetPatternCache(): void
+    {
+        foreach (self::PATTERN_CACHE_KEYS as $key) {
+            Cache::forget($key);
+        }
+    }
 
     public function logs(): HasMany
     {
