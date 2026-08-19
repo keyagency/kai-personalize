@@ -50,11 +50,6 @@ return [
 
     // Tracking security
     'tracking' => [
-        // Secret key for HMAC signature validation (generate with: php artisan key:generate --show)
-        // If empty, signature validation is disabled (not recommended for production)
-        'signature_secret' => env('KAI_TRACKING_SECRET', ''),
-        // Signature expires after this many seconds (prevents replay attacks)
-        'signature_ttl' => 300, // 5 minutes
         // Allowed origins for tracking requests (prevents cross-origin attacks)
         // Use wildcard for subdomains: ['*.yourdomain.com']
         // Empty array allows all origins (not recommended for production)

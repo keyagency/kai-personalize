@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Validator;
 use KeyAgency\KaiPersonalize\Models\Event;
 use KeyAgency\KaiPersonalize\Models\Visitor;
 use KeyAgency\KaiPersonalize\Models\VisitorSession;
-use KeyAgency\KaiPersonalize\Services\TrackingSignatureService;
 
 class TrackingController
 {
@@ -21,50 +20,6 @@ class TrackingController
         // Check if behavioral tracking is enabled
         if (! config('kai-personalize.features.behavioral_tracking')) {
             return response()->json(['status' => 'disabled'], 200);
-        }
-
-        // Verify signature if enabled
-        $signatureService = app(TrackingSignatureService::class);
-
-        if ($signatureService->isEnabled()) {
-            $signature = $request->input('signature');
-            $timestamp = $request->input('timestamp');
-            $nonce = $request->input('nonce');
-            $visitorId = $request->input('visitor_id');
-
-            if (! $signature || ! $timestamp || ! $nonce) {
-                Log::warning('Kai tracking: Missing signature components', [
-                    'ip' => $request->ip(),
-                    'has_signature' => (bool) $signature,
-                    'has_timestamp' => (bool) $timestamp,
-                    'has_nonce' => (bool) $nonce,
-                ]);
-
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Signature verification required',
-                ], 403);
-            }
-
-            // Build payload for verification
-            $payload = [
-                'nonce' => $nonce,
-                'timestamp' => $timestamp,
-                'visitor_id' => $visitorId,
-            ];
-
-            if (! $signatureService->verify($payload, $signature)) {
-                Log::warning('Kai tracking: Invalid signature', [
-                    'ip' => $request->ip(),
-                    'visitor_id' => $visitorId,
-                    'timestamp' => $timestamp,
-                ]);
-
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Invalid or expired signature',
-                ], 403);
-            }
         }
 
         // Validate referer to prevent cross-origin attacks

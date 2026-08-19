@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Illuminate\Support\Facades\Route;
 use KeyAgency\KaiPersonalize\Http\Controllers\Api\TrackingController;
 use KeyAgency\KaiPersonalize\Http\Middleware\ThrottleTracking;
@@ -10,7 +11,15 @@ use KeyAgency\KaiPersonalize\Http\Middleware\ThrottleTracking;
 
 Route::middleware([ThrottleTracking::class])->group(function () {
     // Visitor tracking endpoints
-    Route::post('track', [TrackingController::class, 'track'])->name('track');
+    //
+    // The tracking endpoint is deliberately exempt from CSRF verification. The tracker
+    // sends its final batch with navigator.sendBeacon() on page unload, which cannot set
+    // headers, and events must keep arriving after the visitor's session has expired.
+    // Requests are guarded by the origin/referer check in TrackingController and by the
+    // rate limits in ThrottleTracking instead.
+    Route::post('track', [TrackingController::class, 'track'])
+        ->withoutMiddleware([ValidateCsrfToken::class])
+        ->name('track');
     Route::get('visitor', [TrackingController::class, 'visitor'])->name('visitor');
 
     // API routes are disabled until controllers are implemented

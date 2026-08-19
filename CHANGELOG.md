@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.9 (2026-08-19)
+
+- [fix] **Tracking endpoint returned 419 Page Expired** - the tracker POSTs to `/!/kai-personalize/track`, which runs in the `web` middleware group and therefore through CSRF verification, while neither `tracker.js` nor `sendBeacon` sends a token. **No tracking event has ever arrived on a site that did not work around this.** The route now exempts itself from `ValidateCsrfToken`, so the host application needs no setup at all
+- [breaking] **The HMAC signature layer is gone** - `KAI_TRACKING_SECRET`, `tracking.signature_secret` and `tracking.signature_ttl` are no longer read, and `TrackingSignatureService` is removed. The layer was never finished on the client side: the controller demanded `signature`, `timestamp` and `nonce`, but no tracker version ever sent them, so **a filled `KAI_TRACKING_SECRET` silently rejected every event with a 403**. It was also a weaker reimplementation of CSRF - no session binding, a 300s TTL, and unusable from `sendBeacon` on page unload. Requests are guarded by the origin/referer check and the rate limits instead. **Remove `KAI_TRACKING_SECRET` from your `.env`** - it is a dead key
+- [breaking] **`{{ kai:tracking }}` no longer returns signature data** - it now returns `url` and `enabled`. `{{ kai:tracking:signature }}` is removed
+- [changed] **The README's CSRF instructions are obsolete** - earlier versions told you to add a `validateCsrfTokens(except: …)` rule to `bootstrap/app.php`. That rule can be removed. It never worked as written either: the documented pattern `kai-personalize/track` misses Statamic's action prefix, so the real path `!/kai-personalize/track` never matched it
+- [changed] **Dropped the `version` field from `package.json`** - it had drifted to 1.2.1 and served no purpose (the package is private and never published), leaving `ServiceProvider::VERSION` and the git tag as the only version sources. `TRACKER_VERSION` in `tracker.js` stays at 1.2.5; the script itself is unchanged in this release
+
 ## 1.2.8 (2026-08-15)
 
 - [fix] **Tracking crashed on empty UTM parameters** - `?utm_term=` (as Google Ads appends) produced `Column 'attribute_value' cannot be null`, which aborted the rest of the request's tracking: language, device attributes, geolocation and the page view were all silently lost. Empty and non-string values are now skipped

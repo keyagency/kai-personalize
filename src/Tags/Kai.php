@@ -603,15 +603,15 @@ class Kai extends Tags
     }
 
     // =========================================================================
-    // TRACKING SIGNATURE METHODS
+    // TRACKING METHODS
     // =========================================================================
 
     /**
      * {{ kai:tracking }}
-     * Returns signature data for secure client-side tracking
+     * Returns the tracking endpoint and whether behavioural tracking is on
      *
      * Usage: {{ kai:tracking }}
-     *   Returns: signature, nonce, timestamp, enabled, visitor_id
+     *   Returns: url, enabled
      */
     public function tracking(): array
     {
@@ -620,15 +620,6 @@ class Kai extends Tags
         $trackingTag->setParameters($this->params);
 
         return $trackingTag->index();
-    }
-
-    /**
-     * {{ kai:tracking:signature }}
-     * Alias for tracking method
-     */
-    public function trackingSignature(): array
-    {
-        return $this->tracking();
     }
 
     // =========================================================================

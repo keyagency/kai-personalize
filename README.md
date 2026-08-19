@@ -157,9 +157,8 @@ KAI_QUEUE_PERSIST=true
 KAI_QUEUE_STORAGE_KEY=kai_tracker_queue
 KAI_QUEUE_MAX_EVENT_AGE=3600000
 
-# Security (optional but recommended for production)
-KAI_TRACKING_SECRET=your-unique-secret-key-here
-KAI_TRACKING_ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+# Security (optional but strongly recommended for production)
+KAI_TRACKING_ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com,*.yourdomain.com
 
 # Bot Blacklist Configuration (enabled by default since 1.2.8)
 KAI_BLACKLIST_ENABLED=true
@@ -883,62 +882,33 @@ Get behavioral statistics for the current visitor:
 
 ### kai:tracking
 
-Generates cryptographic signatures for secure tracking endpoint validation. **Only required when `KAI_TRACKING_SECRET` is configured.**
-
-#### Usage
-
-When HMAC signature validation is enabled, use this tag to generate a signature for the tracking endpoint:
+Returns the tracking endpoint and whether behavioural tracking is on.
 
 ```antlers
 {{ kai:tracking }}
-    {{ signature }}        {{! HMAC SHA-256 signature }}
-    {{ nonce }}            {{! Unique nonce for replay protection }}
-    {{ timestamp }}        {{! Current Unix timestamp }}
-    {{ enabled }}          {{! Whether signature validation is enabled }}
+    {{ url }}              {{! The tracking endpoint }}
+    {{ enabled }}          {{! Whether behavioural tracking is on }}
 {{ /kai:tracking }}
 ```
 
-#### JavaScript Integration
+You rarely need this — `{{ kai:track }}` renders the tracker and wires up the endpoint itself.
 
-The signature must be included with tracking requests:
+## Tracking endpoint security
 
-```javascript
-// Get signature from kai:tracking tag (mounted on window)
-fetch(window.KaiTracking.endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-        visitor_id: window.KaiConfig.visitorId,
-        session_id: window.KaiConfig.sessionId,
-        events: events,
-        signature: window.KaiTracking.signature,
-        nonce: window.KaiTracking.nonce,
-        timestamp: window.KaiTracking.timestamp
-    })
-});
-```
+The tracking endpoint needs no setup in the host application. It is exempt from CSRF
+verification by the addon itself (`routes/actions.php`), because the tracker sends its final
+batch with `navigator.sendBeacon()` on page unload — which cannot set headers — and events must
+keep arriving after a visitor's session has expired.
 
-#### When to Use
+Requests are guarded two ways instead:
 
-- **Required** when `KAI_TRACKING_SECRET` is set in `.env`
-- **Not needed** for basic tracking without signature validation
-- The `{{ kai:track }}` tag automatically handles this internally
+- **Origin/referer check** — `KAI_TRACKING_ALLOWED_ORIGINS` (see Configuration). Leave it empty
+  and every origin is accepted, which is fine locally but not in production.
+- **Rate limiting** — per-IP limits per minute and per hour, in `ThrottleTracking`.
 
-## Installation - CSRF Exceptions
-
-When using the tracking endpoint, you must add CSRF token exceptions to `bootstrap/app.php`:
-
-```php
-// bootstrap/app.php
-->withMiddleware(function (Middleware $middleware) {
-    $middleware->validateCsrfTokens(except: [
-        'kai-personalize/track',      // Main tracking endpoint
-        'kai-personalize/*',          // All Kai Personalize routes
-    ]);
-})
-```
-
-This allows the tracking JavaScript to POST events without CSRF tokens.
+> **Upgrading from < 1.2.9?** Earlier versions asked you to add a `validateCsrfTokens(except: …)`
+> rule to `bootstrap/app.php`. That is no longer needed and the rule can be removed. The HMAC
+> signature layer and `KAI_TRACKING_SECRET` were dropped in the same release.
 
 ## Cloudflare Configuration
 
@@ -1100,63 +1070,27 @@ The addon includes multiple layers of protection to prevent data pollution and a
 | **Input Sanitization** | Event types validated, HTML stripped, whitelist keys | ✅ Enabled |
 | **Max Events** | Maximum 50 events per request | ✅ Enabled |
 | **Event Type Regex** | Only alphanumeric + underscore allowed | ✅ Enabled |
-| **HMAC Signatures** | Cryptographic validation of tracking requests | ⚠️ Optional |
-| **Timestamp Validation** | Rejects expired signatures (5 min) | ⚠️ Optional |
-| **Replay Protection** | Nonce caching prevents duplicate requests | ⚠️ Optional |
 | **Origin Validation** | Whitelist allowed domains | ⚠️ Optional |
 
-### Enabling HMAC Signature Validation (Recommended for Production)
+### Restricting Origins (Recommended for Production)
 
-To enable cryptographic signature validation, configure a secret key:
+The tracking endpoint accepts requests from any origin until you list the ones you trust:
 
 ```env
-# Generate a unique 32+ character string
-KAI_TRACKING_SECRET=your-unique-secret-key-here
-
-# Optional: Restrict to your domains (comma-separated)
+# Comma-separated; a *. wildcard also matches the bare domain
 KAI_TRACKING_ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com,*.yourdomain.com
 ```
 
-### How Signature Validation Works
-
-1. **Server generates signature** using the `{{ kai:tracking }}` tag:
-   ```antlers
-   {{ kai:tracking }}
-       signature: "abc123..."
-       nonce: "def456..."
-       timestamp: 1738492800
-       enabled: true
-   {{ /kai:tracking }}
-   ```
-
-2. **Client includes signature** with tracking requests:
-   ```javascript
-   fetch('/kai-personalize/track', {
-       method: 'POST',
-       headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify({
-           visitor_id: '...',
-           session_id: '...',
-           events: [...],
-           signature: '...',    // From server
-           nonce: '...',         // From server
-           timestamp: 1738492800 // From server
-       })
-   });
-   ```
-
-3. **Server verifies** before processing:
-   - Signature matches (HMAC SHA-256)
-   - Timestamp is recent (within 5 minutes)
-   - Nonce hasn't been used before
+Every host that serves pages carrying the tracker has to be in this list — including each
+subdomain and any additional domain. A host that is missing gets its requests rejected with
+`403 Invalid origin`, logged as `Kai tracking: Invalid referer`.
 
 ### Security Best Practices
 
-1. **Always use HTTPS** - Signatures can be intercepted over HTTP
-2. **Generate a strong secret** - Use `php artisan key:generate --show`
-3. **Set allowed origins** - Restricts cross-origin requests
-4. **Monitor logs** - Failed signature attempts are logged
-5. **Use a WAF** - CloudFlare or similar for DDoS protection
+1. **Always use HTTPS** - Tracking payloads can be read over HTTP
+2. **Set allowed origins** - Restricts cross-origin requests
+3. **Monitor logs** - Rejected origins and rate-limit hits are logged
+4. **Use a WAF** - CloudFlare or similar for DDoS protection
 
 ## Performance
 
