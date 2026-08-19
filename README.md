@@ -121,12 +121,19 @@ The addon automatically tracks visitors as they browse your site!
 composer require keyagency/kai-personalize
 ```
 
-2. Publish configuration and translations:
+2. Publish configuration, translations and assets:
 
 ```bash
 php artisan vendor:publish --tag=kai-personalize-config
 php artisan vendor:publish --tag=kai-personalize-translations
+php artisan vendor:publish --tag=kai-personalize-assets
 ```
+
+The assets tag holds the Control Panel stylesheet and the tracker script. Publishing lets your
+webserver hand the tracker out directly; skip it and the addon falls back to serving the file
+through PHP, which still works but costs a full framework boot per visitor. **Republish with
+`--force` after every upgrade**, and add it to your deploy script — `public/vendor` is usually
+gitignored, so a fresh release starts without it.
 
 3. Run migrations:
 

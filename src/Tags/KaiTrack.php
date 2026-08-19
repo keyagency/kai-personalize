@@ -3,7 +3,7 @@
 namespace KeyAgency\KaiPersonalize\Tags;
 
 use Illuminate\Support\Facades\Session;
-use KeyAgency\KaiPersonalize\Models\Visitor;
+use KeyAgency\KaiPersonalize\ServiceProvider;
 use Statamic\Tags\Tags;
 
 class KaiTrack extends Tags
@@ -66,9 +66,7 @@ class KaiTrack extends Tags
             'maxEventAge' => config('kai-personalize.queue.max_event_age', 3600000),
         ]);
 
-        $trackerUrl = config('kai-personalize.tracking.use_minified_js', true)
-            ? route('kai-personalize.tracker-min')
-            : route('kai-personalize.tracker');
+        $trackerUrl = $this->trackerUrl();
 
         return <<<JS
 <script>
@@ -81,8 +79,40 @@ class KaiTrack extends Tags
         queueSettings: {$queueSettingsJson},
     };
 </script>
-<script src="{$trackerUrl}"></script>
+<script src="{$trackerUrl}" defer></script>
 JS;
+    }
+
+    /**
+     * URL of the tracker script.
+     *
+     * Prefer the published copy under public/, which the webserver hands out directly. Falling
+     * back to the route means PHP serves an 8 KB static file through the full framework boot -
+     * an order of magnitude slower, and a worker occupied per visitor. The version query busts
+     * the cache on upgrade, which the route's URL cannot do.
+     */
+    protected function trackerUrl(): string
+    {
+        $minified = config('kai-personalize.tracking.use_minified_js', true);
+        $file = $minified ? 'tracker.min.js' : 'tracker.js';
+
+        if ($this->publishedTrackerExists($file)) {
+            return asset('vendor/kai-personalize/js/'.$file).'?v='.ServiceProvider::VERSION;
+        }
+
+        return $minified
+            ? route('kai-personalize.tracker-min')
+            : route('kai-personalize.tracker');
+    }
+
+    /**
+     * Whether the tracker has been published, memoized for the request.
+     */
+    protected function publishedTrackerExists(string $file): bool
+    {
+        static $published = [];
+
+        return $published[$file] ??= file_exists(public_path('vendor/kai-personalize/js/'.$file));
     }
 
     protected function boolToString(bool $value): string

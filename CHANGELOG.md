@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.10 (2026-08-19)
+
+- [fix] **The tracker script blocked page rendering** - `{{ kai:track }}` wrote a bare `<script src>`, so the parser stopped until the script had been fetched and run. It now carries `defer`. Tracking does not start any later for it: `init()` already waits for DOM-ready either way
+- [fix] **The tracker was served by PHP instead of the webserver** - every visitor paid a full framework boot for an 8 KB static file, and occupied a PHP worker while doing so. Measured on a local machine: ~390 ms to first byte, against ~12 ms for the same kind of file served off disk. The script is now published to `public/vendor/kai-personalize/js` and linked from there. **Run `php artisan vendor:publish --tag=kai-personalize-assets --force` after upgrading**; without it the addon falls back to the old route and keeps working, just slowly
+- [changed] **The published tracker URL carries a `?v=` version query**, so an upgrade reaches returning visitors immediately
+- [changed] **The fallback route no longer sends `immutable`** - it sat on a URL with no version in it, which left returning visitors on a stale tracker for a day after every upgrade. It is now `public, max-age=3600`
+- [changed] Dropped an unused `Visitor` import from `KaiTrack`
+
 ## 1.2.9 (2026-08-19)
 
 - [fix] **Tracking endpoint returned 419 Page Expired** - the tracker POSTs to `/!/kai-personalize/track`, which runs in the `web` middleware group and therefore through CSRF verification, while neither `tracker.js` nor `sendBeacon` sends a token. **No tracking event has ever arrived on a site that did not work around this.** The route now exempts itself from `ValidateCsrfToken`, so the host application needs no setup at all

@@ -13,7 +13,7 @@ use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
-    const VERSION = '1.2.9';
+    const VERSION = '1.2.10';
 
     protected $tags = [
         Kai::class,
@@ -82,6 +82,7 @@ class ServiceProvider extends AddonServiceProvider
 
         $this->publishes([
             __DIR__.'/../resources/css' => public_path('vendor/kai-personalize/css'),
+            __DIR__.'/../resources/js' => public_path('vendor/kai-personalize/js'),
         ], 'kai-personalize-assets');
 
         $this->publishes([
