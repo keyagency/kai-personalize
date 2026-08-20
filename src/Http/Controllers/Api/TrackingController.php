@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use KeyAgency\KaiPersonalize\Models\Event;
+use KeyAgency\KaiPersonalize\Models\PageView;
 use KeyAgency\KaiPersonalize\Models\Visitor;
+use KeyAgency\KaiPersonalize\Models\VisitorAttribute;
 use KeyAgency\KaiPersonalize\Models\VisitorSession;
 
 class TrackingController
@@ -122,24 +124,44 @@ class TrackingController
             if ($existingVisitor && $existingVisitor->id !== $visitor->id) {
                 // Fingerprint already belongs to another visitor - use that visitor instead
                 // This happens when the same user is tracked from different contexts
-                // Update the session to reference the correct visitor
+                $mergedFrom = $visitor;
+
                 $session->update([
                     'visitor_id' => $existingVisitor->id,
                 ]);
 
-                // Update stored events to reference the correct visitor
+                // Everything attached to the temporary visitor moves across. Without
+                // page views and attributes, half the data stayed behind on a record
+                // nobody looks up again, and a single visit counted as two visitors
+                // in reporting.
                 Event::where('session_id', $session->id)
-                    ->where('visitor_id', $visitor->id)
+                    ->where('visitor_id', $mergedFrom->id)
+                    ->update(['visitor_id' => $existingVisitor->id]);
+
+                PageView::where('visitor_id', $mergedFrom->id)
+                    ->update(['visitor_id' => $existingVisitor->id]);
+
+                VisitorAttribute::where('visitor_id', $mergedFrom->id)
                     ->update(['visitor_id' => $existingVisitor->id]);
 
                 // Use the existing visitor for response
                 $visitor = $existingVisitor;
 
                 Log::info('Kai tracking: Merged visitor to existing fingerprint', [
-                    'temp_visitor_id' => $visitor->id,
+                    'temp_visitor_id' => $mergedFrom->id,
                     'existing_visitor_id' => $existingVisitor->id,
                     'fingerprint_hash' => $newFingerprint,
                 ]);
+
+                // Once emptied, the temporary visitor holds nothing. Leaving it in
+                // place produces a blank record on every repeat visit, and the Control
+                // Panel cannot tell one from a real visitor.
+                //
+                // Only a temp_ record is removed: merging two real fingerprints must
+                // never delete either of them.
+                if (str_starts_with((string) $mergedFrom->fingerprint_hash, 'temp_')) {
+                    $mergedFrom->delete();
+                }
             } else {
                 // Fingerprint is unique - safe to update
                 try {

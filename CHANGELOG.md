@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.11 (2026-08-20)
+
+- [fix] **The blacklist blocked bots but recorded none of them** - `BlacklistService::logHit()` wrote `$request->fullUrl()` and the raw user agent straight into `url` and `user_agent`, both `varchar(255)`. A blocked bot is exactly the visitor that shows up with an outsized query string, so the insert failed with `SQLSTATE[22001]: Data too long for column 'url'`. The exception bubbled up to `TrackVisitor`, which logged it as **"Kai Personalize tracking error"** - a message pointing at tracking while nothing was wrong there. On an affected install `kai_personalize_blacklist_logs` stays empty no matter how many patterns are active. Both values are now clipped to 255
+- [fix] **Blacklist hit counters never moved** - `incrementHit()` sat behind the failing insert, so it was skipped along with it, and it also sat behind the `blacklist.logging` toggle, so turning logging off silently stopped counting too. The counter now runs first and independently of that toggle
+- [fix] **Every repeat visit left an empty visitor record behind** - when a client-side fingerprint already belonged to another visitor, `TrackingController` moved the session and its events to that visitor but left the temporary one in place, along with its page views and attributes. The Control Panel then showed a `temp_` record with no detail that is indistinguishable from a real visitor, and the same visit counted twice in reporting. Page views and attributes now move across as well, and the emptied `temp_` record is deleted. A merge between two real fingerprints still deletes neither
+- [fix] **The merge log line reported the wrong id** - `temp_visitor_id` was read after the variable had already been reassigned to the surviving visitor, so it logged that visitor's id twice
+
 ## 1.2.10 (2026-08-19)
 
 - [fix] **The tracker script blocked page rendering** - `{{ kai:track }}` wrote a bare `<script src>`, so the parser stopped until the script had been fetched and run. It now carries `defer`. Tracking does not start any later for it: `init()` already waits for DOM-ready either way

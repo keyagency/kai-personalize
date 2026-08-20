@@ -118,6 +118,13 @@ class BlacklistService
 
     protected function logHit(Request $request): void
     {
+        // Counted before the log row, and outside the logging toggle: a hit belongs
+        // to the match itself, not to recording it. In the old order a failed insert
+        // took the count down with it, and with logging off it disappeared entirely.
+        if (isset($this->matchedBlacklist)) {
+            $this->matchedBlacklist->incrementHit();
+        }
+
         if (! config('kai-personalize.blacklist.logging', true)) {
             return;
         }
@@ -128,14 +135,28 @@ class BlacklistService
         BlacklistLog::create([
             'blacklist_id' => $this->matchedBlacklist->id ?? null,
             'bot_name' => $botName,
-            'user_agent' => $this->userAgent,
+            // url and user_agent are varchar(255), and a blocked bot is exactly the
+            // visitor that arrives with an outsized query string or user agent.
+            // Unclipped, the insert fails with SQLSTATE[22001]; that exception
+            // bubbles up to TrackVisitor and surfaces as "Kai Personalize tracking
+            // error" even though tracking itself is fine. The net effect was a
+            // blacklist that blocked traffic but recorded not a single hit.
+            'user_agent' => $this->truncate($this->userAgent),
             'ip_address' => $this->ip,
-            'url' => $request->fullUrl(),
+            'url' => $this->truncate($request->fullUrl()),
         ]);
+    }
 
-        if (isset($this->matchedBlacklist)) {
-            $this->matchedBlacklist->incrementHit();
+    /**
+     * Clip a value to what a varchar(255) column will hold.
+     */
+    protected function truncate(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
         }
+
+        return mb_strlen($value) > 255 ? mb_substr($value, 0, 255) : $value;
     }
 
     public function getMatchedBlacklist(): ?Blacklist
