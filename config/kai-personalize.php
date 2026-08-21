@@ -58,6 +58,13 @@ return [
             : [],
         // Use minified JavaScript for tracker (recommended for production)
         'use_minified_js' => env('KAI_USE_MINIFIED_JS', true),
+        // Per-IP rate limits on the tracking endpoints. A limit of 0 disables that window.
+        // The tracker batches events, so a single visit costs a handful of requests; keep
+        // room for shared addresses (office NAT, mobile carriers) behind one IP.
+        'rate_limit' => [
+            'per_minute' => (int) env('KAI_TRACKING_RATE_LIMIT_PER_MINUTE', 120),
+            'per_hour' => (int) env('KAI_TRACKING_RATE_LIMIT_PER_HOUR', 1000),
+        ],
     ],
 
     // Session configuration (extends Laravel session)

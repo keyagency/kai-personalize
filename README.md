@@ -167,6 +167,10 @@ KAI_QUEUE_MAX_EVENT_AGE=3600000
 # Security (optional but strongly recommended for production)
 KAI_TRACKING_ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com,*.yourdomain.com
 
+# Per-IP rate limits on the tracking endpoints (optional; 0 disables a window)
+KAI_TRACKING_RATE_LIMIT_PER_MINUTE=120
+KAI_TRACKING_RATE_LIMIT_PER_HOUR=1000
+
 # Bot Blacklist Configuration (enabled by default since 1.2.8)
 KAI_BLACKLIST_ENABLED=true
 KAI_BLACKLIST_LOGGING=true
@@ -911,7 +915,16 @@ Requests are guarded two ways instead:
 
 - **Origin/referer check** — `KAI_TRACKING_ALLOWED_ORIGINS` (see Configuration). Leave it empty
   and every origin is accepted, which is fine locally but not in production.
-- **Rate limiting** — per-IP limits per minute and per hour, in `ThrottleTracking`.
+- **Rate limiting** — per-IP limits per minute and per hour, in `ThrottleTracking`. Both are
+  configurable: `KAI_TRACKING_RATE_LIMIT_PER_MINUTE` (default 120) and
+  `KAI_TRACKING_RATE_LIMIT_PER_HOUR` (default 1000), with `0` to switch a window off. The IP comes
+  from `$request->ip()`, so behind a proxy you need trusted proxies configured — see below.
+  Bear in mind that one visit costs several requests: the tracker batches its events.
+
+> **Upgrading from < 1.2.12?** The rate limit counters of earlier versions never expired on a file
+> cache store, which left an IP on `429` for good once it had passed the limit. Run
+> `php artisan cache:clear` after upgrading to drop those entries; the new counters use different
+> cache keys and expire on their own.
 
 > **Upgrading from < 1.2.9?** Earlier versions asked you to add a `validateCsrfTokens(except: …)`
 > rule to `bootstrap/app.php`. That is no longer needed and the rule can be removed. The HMAC
